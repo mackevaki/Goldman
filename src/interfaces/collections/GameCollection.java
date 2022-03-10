@@ -4,7 +4,6 @@ import abstracts.AbstractGameObject;
 import enums.GameObjectType;
 import objects.Coordinate;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 

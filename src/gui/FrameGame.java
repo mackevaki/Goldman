@@ -323,14 +323,17 @@ public class FrameGame extends BaseChildFrame {
     }//GEN-LAST:event_jbtnSaveActionPerformed
 
     private void jbtnLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnLeftActionPerformed
+        moveGameObject(MovingDirection.LEFT, GameObjectType.GOLDMAN);
 
     }//GEN-LAST:event_jbtnLeftActionPerformed
 
     private void jbtnRightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnRightActionPerformed
+        moveGameObject(MovingDirection.RIGHT, GameObjectType.GOLDMAN);
 
     }//GEN-LAST:event_jbtnRightActionPerformed
 
     private void jbtnDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnDownActionPerformed
+        moveGameObject(MovingDirection.DOWN, GameObjectType.GOLDMAN);
 
     }//GEN-LAST:event_jbtnDownActionPerformed
 
