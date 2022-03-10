@@ -1,0 +1,13 @@
+The Map,50,11
+wall,nothing,wall,wall,wall,wall,wall,wall,wall,wall,wall
+wall,nothing,wall,nothing,nothing,nothing,nothing,nothing,exit,wall,wall
+wall,wall,wall,nothing,wall,wall,treasure,wall,wall,wall,wall
+wall,wall,treasure,nothing,nothing,wall,wall,wall,monster,wall,treasure
+wall,wall,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing
+wall,wall,nothing,nothing,nothing,wall,nothing,wall,wall,wall,wall
+wall,wall,wall,nothing,wall,wall,wall,wall,wall,wall,wall
+wall,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,monster,wall
+wall,nothing,wall,wall,wall,nothing,wall,nothing,wall,wall,wall
+wall,nothing,treasure,wall,wall,monster,wall,goldman,wall,wall,wall
+wall,nothing,wall,wall,wall,nothing,wall,nothing,wall,wall,wall
+wall,wall,wall,wall,wall,wall,wall,nothing,wall,wall,wall
