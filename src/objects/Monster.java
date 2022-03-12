@@ -1,6 +1,5 @@
 package objects;
 
-import abstracts.AbstractGameObject;
 import abstracts.AbstractMovingObject;
 import enums.GameObjectType;
 import enums.MovingDirection;
@@ -13,17 +12,16 @@ public class Monster extends AbstractMovingObject {
     public Monster(Coordinate coordinate) {
         super.setCoordinate(coordinate);
         super.setType(GameObjectType.MONSTER);
-
-        super.setIconLeft(getImageIcon("/images/monster_left.jpg"));
-        super.setIconRight(getImageIcon("/images/monster_right.jpg"));
-        super.setIconUp(getImageIcon("/images/monster_up.jpg"));
-        super.setIconDown(getImageIcon("/images/monster_down.jpg"));
-
-        super.setIcon(super.getIconLeft()); // по умолчанию будет использоваться эта кнопка
+        super.setIcon(getImageIcon("/images/monster_left.jpg")); // по умолчанию будет использоваться эта кнопка
     }
 
     @Override
-    public void getMoveResult(AbstractGameObject objectInNewCoordinate) {
-        throw new UnsupportedOperationException("Methods are not supported yet");
+    public void changeIcon(MovingDirection direction) {
+        switch (direction) {
+            case LEFT -> super.setIcon(getImageIcon("/images/monster_left.jpg"));
+            case RIGHT -> super.setIcon(getImageIcon("/images/monster_right.jpg"));
+            case DOWN -> super.setIcon(getImageIcon("/images/monster_down.jpg"));
+            case UP -> super.setIcon(getImageIcon("/images/monster_up.jpg"));
+        }
     }
 }

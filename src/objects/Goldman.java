@@ -16,13 +16,7 @@ public class Goldman extends AbstractMovingObject {
     public Goldman(Coordinate coordinate) {
         super.setCoordinate(coordinate);
         super.setType(GameObjectType.GOLDMAN);
-
-        super.setIconLeft(getImageIcon("/images/goldman_left.png"));
-        super.setIconRight(getImageIcon("/images/goldman_right.png"));
-        super.setIconUp(getImageIcon("/images/goldman_up.png"));
-        super.setIconDown(getImageIcon("/images/goldman_down.png"));
-
-        super.setIcon(super.getIconUp());
+        super.setIcon(getImageIcon("/images/goldman_up.png"));
     }
 
     public int getTotalScore() {
@@ -42,7 +36,12 @@ public class Goldman extends AbstractMovingObject {
     }
 
     @Override
-    public void getMoveResult(AbstractGameObject objectInNewCoordinate) {
-        throw new UnsupportedOperationException("Methods are not supported yet");
+    public void changeIcon(MovingDirection direction) {
+        switch (direction) {
+            case LEFT -> super.setIcon(getImageIcon("/images/goldman_left.png"));
+            case RIGHT -> super.setIcon(getImageIcon("/images/goldman_right.png"));
+            case DOWN -> super.setIcon(getImageIcon("/images/goldman_down.png"));
+            case UP -> super.setIcon(getImageIcon("/images/goldman_up.png"));
+        }
     }
 }

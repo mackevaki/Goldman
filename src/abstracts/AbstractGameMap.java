@@ -1,6 +1,7 @@
 package abstracts;
 
 import enums.GameObjectType;
+import enums.MovingDirection;
 import interfaces.collections.GameCollection;
 import interfaces.gamemaps.GameMap;
 import objects.Coordinate;
@@ -102,8 +103,6 @@ public abstract class AbstractGameMap implements GameMap, Serializable {
         isGoldManExists = goldManExists;
     }
 
-
-
     public AbstractGameObject getObjectPriority(AbstractGameObject firstObject, AbstractGameObject secondObject) {
         // приоритет объекта зависит от номера индекса объекта в enum
         return (firstObject.getType().getIndexPriority() > secondObject.getType().getIndexPriority()) ? firstObject : secondObject;
@@ -113,5 +112,16 @@ public abstract class AbstractGameMap implements GameMap, Serializable {
         return isExitExists && isGoldManExists; // если есть вход и выход -  крата валидна
     }
 
+    public void move(MovingDirection direction, GameObjectType gameObjectType) {
 
+        for (AbstractGameObject gameObject :
+                getGameCollection().getListOfDefinitObjects(gameObjectType)) {
+            if (gameObject instanceof AbstractMovingObject) { //дорогостоящая операция
+                AbstractMovingObject movingObject = (AbstractMovingObject) gameObject;
+                movingObject.move(direction, this);
+            }
+        }
+
+
+    }
 }

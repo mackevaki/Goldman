@@ -365,11 +365,8 @@ public class FrameGame extends BaseChildFrame {
     // End of variables declaration//GEN-END:variables
 
     private void moveGameObject(MovingDirection direction, GameObjectType gameObjectType) {
-        AbstractGameObject gameObject = gameMap.getGameMap().getGameCollection().getListOfDefinitObjects(gameObjectType).get(0);
+        gameMap.getGameMap().move(direction, gameObjectType);
+        gameMap.drawMap();
 
-        if (gameObject instanceof AbstractMovingObject) { //дорогостоящая операция
-            ((AbstractMovingObject)gameObject).move(direction);
-            gameMap.drawMap();
-        }
     }
 }
