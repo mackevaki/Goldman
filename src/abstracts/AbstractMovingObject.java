@@ -1,54 +1,87 @@
 package abstracts;
 
+import enums.ActionResult;
 import enums.MovingDirection;
+import interfaces.gameobjects.GameObjectMoveListener;
+import interfaces.gameobjects.MoveListener;
 import interfaces.gameobjects.MovingObject;
 import objects.Coordinate;
 
-public abstract class AbstractMovingObject extends AbstractGameObject implements MovingObject {
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class AbstractMovingObject extends AbstractGameObject implements MovingObject, MoveListener {
 
     public abstract void changeIcon(MovingDirection direction);
+    private int step = 1; // по-умолчанию у всех объектов шаг равен 1
 
     @Override
-    public void move(MovingDirection direction, AbstractGameMap abstractGameMap) {
-        Coordinate newCoordinate = getNewCoordinate(direction);
+    public int getStep() {
+        return step;
+    }
 
-        AbstractGameObject objectInNewCoordinate = abstractGameMap.getGameCollection().getObjectByCoordinate(newCoordinate);
+    public void setStep(int step) {
+        this.step = step;
+    }
 
-        switch (objectInNewCoordinate.getType()) {
+    protected void actionBeforeMove(MovingDirection direction) {
+        // при движении объект должен сменить иконку и произвести звук
+        changeIcon(direction);
+        // playSound();
+    }
+
+    /**
+     * @param gameObject - объект, с которым будем взаимодействовать
+     * @return
+     */
+    public ActionResult doAction(AbstractGameObject gameObject) {
+        if (gameObject == null) { // край карты
+            return ActionResult.NO_ACTION;
+        }
+
+        switch (gameObject.getType()) {
             case NOTHING -> {
-                changeIcon(direction);
-                this.setCoordinate(newCoordinate);
-            }
-            default -> { }
-        }
-
-    }
-
-    public Coordinate getNewCoordinate(MovingDirection direction) {
-        // берем текущие координаты объекта, которые нужно передвинуть
-        int x = this.getCoordinate().getX();
-        int y = this.getCoordinate().getY();
-
-        Coordinate newCoordinate = new Coordinate(x, y);
-
-        switch (direction) {
-            case UP -> {
-                newCoordinate.setXY(x, y - 1);
-            }
-            case DOWN -> {
-                newCoordinate.setXY(x, y + 1);
-            }
-            case RIGHT -> {
-                newCoordinate.setXY(x + 1, y);
-            }
-            case LEFT -> {
-                newCoordinate.setXY(x - 1, y);
+                return ActionResult.MOVE;
             }
         }
 
-        return newCoordinate;
+        return ActionResult.NO_ACTION;
     }
 
+    @Override
+    public ActionResult moveToObject(MovingDirection direction, AbstractGameObject abstractGameObject) {
+        actionBeforeMove(direction);
+        return doAction(abstractGameObject);
+    }
 
+    private ArrayList<GameObjectMoveListener> listeners = new ArrayList<>();
 
+    @Override
+    public List<GameObjectMoveListener> getListeners() {
+        return listeners;
+    }
+
+    @Override
+    public void addListener(GameObjectMoveListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(GameObjectMoveListener listener) {
+        listeners.remove(listener);
+    }
+
+    @Override
+    public void removeAllListeners() {
+        listeners.clear();
+    }
+
+    /**
+     * @param obj1 - объект, который движется
+     * @param obj2 - объект, на место которого совершается перемещение
+     */
+    @Override
+    public void notifyListeners(AbstractGameObject obj1, AbstractGameObject obj2) {
+        throw new UnsupportedOperationException("Not supported yet");
+    }
 }

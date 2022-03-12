@@ -4,8 +4,6 @@
  */
 package gui;
 
-import abstracts.AbstractGameObject;
-import abstracts.AbstractMovingObject;
 import enums.GameObjectType;
 import enums.MovingDirection;
 import interfaces.gamemaps.DrawableMap;

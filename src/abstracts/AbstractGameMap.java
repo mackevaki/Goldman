@@ -4,13 +4,8 @@ import enums.GameObjectType;
 import enums.MovingDirection;
 import interfaces.collections.GameCollection;
 import interfaces.gamemaps.GameMap;
-import objects.Coordinate;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashMap;
 
 /**
  * базовая карта без какого-либо отображения
@@ -113,15 +108,6 @@ public abstract class AbstractGameMap implements GameMap, Serializable {
     }
 
     public void move(MovingDirection direction, GameObjectType gameObjectType) {
-
-        for (AbstractGameObject gameObject :
-                getGameCollection().getListOfDefinitObjects(gameObjectType)) {
-            if (gameObject instanceof AbstractMovingObject) { //дорогостоящая операция
-                AbstractMovingObject movingObject = (AbstractMovingObject) gameObject;
-                movingObject.move(direction, this);
-            }
-        }
-
-
+        getGameCollection().moveObject(direction, gameObjectType);
     }
 }

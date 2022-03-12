@@ -1,9 +1,12 @@
 package interfaces.gameobjects;
 
-import abstracts.AbstractGameMap;
+import abstracts.AbstractGameObject;
+import enums.ActionResult;
 import enums.MovingDirection;
 
 public interface MovingObject extends StaticObject {
 
-    void move(MovingDirection direction, AbstractGameMap abstractGameMap);
+    int getStep();
+
+    ActionResult moveToObject(MovingDirection direction, AbstractGameObject abstractGameObject);
 }
