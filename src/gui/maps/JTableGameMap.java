@@ -3,7 +3,7 @@ package gui.maps;
 import abstracts.AbstractGameMap;
 import abstracts.AbstractGameObject;
 import enums.GameObjectType;
-import interfaces.collections.GameCollection;
+import interfaces.gamemaps.collections.GameCollection;
 import interfaces.gamemaps.DrawableMap;
 import enums.LocationType;
 import objects.Coordinate;
@@ -15,11 +15,12 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class JTableGameMap implements DrawableMap {
 
     private JTable jTableMap = new JTable();
-
     private AbstractGameMap gameMap;
     private String[] columnNames;
     // объекты для отображения на карте будут храниться в двумерном массиве типа AbstractGameObject
@@ -102,11 +103,48 @@ public class JTableGameMap implements DrawableMap {
                 TableColumn a = jTableMap.getColumnModel().getColumn(i);
                 a.setPreferredWidth(26);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
 
         return true;
+    }
+
+    private TimeMover timeMover = new TimeMover();
+
+    private class TimeMover implements ActionListener {
+
+        private Timer timer;
+        private final static int MOVING_PAUSE = 500;
+
+        private TimeMover() {
+            timer = new Timer(MOVING_PAUSE, this);
+            timer.setInitialDelay(0);
+            timer.start();
+        }
+
+        public void start() {
+            timer.start();
+        }
+
+        public void stop() {
+            timer.stop();
+        }
+
+        /**
+         * Invoked when an action occurs.
+         *
+         * @param e the event to be processed
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            gameMap.getGameCollection().moveObjectRandom(GameObjectType.MONSTER);
+        }
+    }
+
+    public TimeMover getTimeMover() {
+        return timeMover;
     }
 }

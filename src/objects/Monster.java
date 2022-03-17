@@ -1,6 +1,8 @@
 package objects;
 
+import abstracts.AbstractGameObject;
 import abstracts.AbstractMovingObject;
+import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
 
@@ -23,5 +25,23 @@ public class Monster extends AbstractMovingObject {
             case DOWN -> super.setIcon(getImageIcon("/images/monster_down.jpg"));
             case UP -> super.setIcon(getImageIcon("/images/monster_up.jpg"));
         }
+    }
+
+    @Override
+    public ActionResult doAction(AbstractGameObject gameObject) {
+        if (gameObject == null) { // край карты
+            return ActionResult.NO_ACTION;
+        }
+
+        switch (gameObject.getType()) {
+            case TREASURE, MONSTER, WALL -> {
+                return ActionResult.NO_ACTION; //монстр не может наступать на сокровище или других монстров
+            }
+            case GOLDMAN -> {
+                return ActionResult.DIE;
+            }
+        }
+
+        return super.doAction(gameObject);
     }
 }

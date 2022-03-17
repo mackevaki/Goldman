@@ -1,9 +1,7 @@
 package abstracts;
 
-import enums.GameObjectType;
-import enums.MovingDirection;
-import interfaces.collections.GameCollection;
 import interfaces.gamemaps.GameMap;
+import interfaces.gamemaps.collections.GameCollection;
 
 import java.io.Serializable;
 
@@ -107,7 +105,4 @@ public abstract class AbstractGameMap implements GameMap, Serializable {
         return isExitExists && isGoldManExists; // если есть вход и выход -  крата валидна
     }
 
-    public void move(MovingDirection direction, GameObjectType gameObjectType) {
-        getGameCollection().moveObject(direction, gameObjectType);
-    }
 }

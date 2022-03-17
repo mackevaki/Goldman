@@ -6,7 +6,7 @@ package gui;
 
 import enums.LocationType;
 import gui.maps.JTableGameMap;
-import interfaces.gamemaps.MapCollection;
+import interfaces.gamemaps.collections.MapCollection;
 
 import javax.swing.*;
 
@@ -152,7 +152,7 @@ public class FrameMainMenu extends JFrame {
         if (frameGame == null) {
             frameGame = new FrameGame();
         }
-        frameGame.setMap(gameMap);
+        frameGame.setMap( new JTableGameMap(LocationType.FS, "game.map", new MapCollection()));
         frameGame.showFrame(this);
     }//GEN-LAST:event_jbtnNewGameActionPerformed
 

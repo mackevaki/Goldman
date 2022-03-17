@@ -2,6 +2,7 @@ package objects;
 
 import abstracts.AbstractGameObject;
 import abstracts.AbstractMovingObject;
+import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
 
@@ -43,5 +44,34 @@ public class Goldman extends AbstractMovingObject {
             case DOWN -> super.setIcon(getImageIcon("/images/goldman_down.png"));
             case UP -> super.setIcon(getImageIcon("/images/goldman_up.png"));
         }
+    }
+
+    /**
+     * @param gameObject - объект, с которым будем взаимодействовать
+     * @return
+     */
+    @Override
+    public ActionResult doAction(AbstractGameObject gameObject) {
+        turnsNumber++;
+
+        if (gameObject == null) { // край карты
+            return ActionResult.NO_ACTION;
+        }
+
+        switch (gameObject.getType()) {
+            case MONSTER -> {
+                return ActionResult.DIE;
+            }
+            case TREASURE -> {
+                totalScore += ((Treasure)gameObject).getScore();
+                return ActionResult.COLLECT_TREASURE;
+            }
+            case EXIT -> {
+                totalScore *= 2;
+                return ActionResult.WIN;
+            }
+        }
+
+        return super.doAction(gameObject);
     }
 }

@@ -3,7 +3,7 @@ package objects.maps;
 import abstracts.AbstractGameMap;
 import abstracts.AbstractGameObject;
 import enums.GameObjectType;
-import interfaces.collections.GameCollection;
+import interfaces.gamemaps.collections.GameCollection;
 import objects.Coordinate;
 import objects.creators.GameObjectCreator;
 

@@ -4,16 +4,20 @@
  */
 package gui;
 
+import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
 import interfaces.gamemaps.DrawableMap;
+import objects.Goldman;
+import objects.listeners.MoveResultListener;
+import utils.MessageManager;
 
 /**
  *
  * @author vojtech
  */
-public class FrameGame extends BaseChildFrame {
-    private DrawableMap gameMap; // передаем объект карты, которая умеет себя рисовать
+public class FrameGame extends BaseChildFrame implements MoveResultListener {
+    private DrawableMap map; // передаем объект карты, которая умеет себя рисовать
 
     /**
      * Creates new form FrameGame
@@ -23,11 +27,48 @@ public class FrameGame extends BaseChildFrame {
     }
 
     public void setMap(DrawableMap gameMap) {
-        this.gameMap = gameMap;
+        this.map = gameMap;
         gameMap.drawMap();
 
+        gameMap.getGameMap().getGameCollection().addMoveListener(this);
+
+        jlabelTurnsLeft.setText(String.valueOf(gameMap.getGameMap().getTimeLimit()));
         jPanelMap.removeAll();
         jPanelMap.add(gameMap.getMap());
+    }
+
+
+    private void moveGameObject(MovingDirection direction, GameObjectType gameObjectType) {
+        map.getGameMap().getGameCollection().moveObject(direction, gameObjectType);
+    }
+
+    private void gameOver() {
+        MessageManager.showInformMessage(null, "Вы проиграли");
+        closeFrame();
+    }
+
+    @Override
+    public void notifyActionResult(ActionResult actionResult, Goldman goldman) {
+        switch (actionResult) {
+            case MOVE -> {
+                jlabelTurnsLeft.setText(String.valueOf(map.getGameMap().getTimeLimit() - goldman.getTurnsNumber()));
+
+                if (goldman.getTurnsNumber() >= map.getGameMap().getTimeLimit()) {
+                    gameOver();
+                }
+            }
+            case DIE -> {
+                gameOver();
+            }
+            case COLLECT_TREASURE -> jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
+            case WIN -> {
+                jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
+                MessageManager.showInformMessage(null, "Вы выиграли! Количествол набранных очков: " + goldman.getTotalScore());
+                closeFrame();
+            }
+        }
+
+        map.drawMap();
     }
 
     /**
@@ -167,9 +208,8 @@ public class FrameGame extends BaseChildFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jbtnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jbtnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(jbtnLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -180,15 +220,16 @@ public class FrameGame extends BaseChildFrame {
                                 .addGap(47, 47, 47)
                                 .addComponent(jbtnRight, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jbtnUp, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jbtnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jlabelTurnsLeftText)
                             .addComponent(jlabelScoreText))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jlabelScore, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jlabelTurnsLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(24, 24, 24))
+                            .addComponent(jlabelScore, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlabelTurnsLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(32, 32, 32))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -362,9 +403,4 @@ public class FrameGame extends BaseChildFrame {
     private javax.swing.JMenu jmenuService;
     // End of variables declaration//GEN-END:variables
 
-    private void moveGameObject(MovingDirection direction, GameObjectType gameObjectType) {
-        gameMap.getGameMap().move(direction, gameObjectType);
-        gameMap.drawMap();
-
-    }
 }

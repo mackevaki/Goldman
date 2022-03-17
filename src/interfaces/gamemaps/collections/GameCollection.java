@@ -1,14 +1,16 @@
-package interfaces.collections;
+package interfaces.gamemaps.collections;
 
 import abstracts.AbstractGameObject;
+import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
 import objects.Coordinate;
+import objects.listeners.MoveResultNotifier;
 
 import java.util.Collection;
 import java.util.List;
 
-public interface GameCollection {
+public interface GameCollection extends MoveResultNotifier {
     void addGameObject(AbstractGameObject gameObject);
 
     Collection<AbstractGameObject> getAllGameObjects();
@@ -19,5 +21,7 @@ public interface GameCollection {
 
     AbstractGameObject getObjectByCoordinate(int x, int y);
 
-    void moveObject(MovingDirection direction, GameObjectType objectType);
+    ActionResult moveObject(MovingDirection direction, GameObjectType objectType);
+
+    void moveObjectRandom(GameObjectType objectType);
 }
