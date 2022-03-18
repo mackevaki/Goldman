@@ -5,9 +5,9 @@
 package gui;
 
 import enums.LocationType;
-import gui.maps.JTableGameMap;
-import interfaces.gamemaps.collections.MapCollection;
-import objects.sound.impls.WavPlayer;
+import gamemap.impls.JTableGameMap;
+import collections.impls.MapCollection;
+import sound.impls.WavPlayer;
 import user.AbstractUserManager;
 import user.DBUserManager;
 import user.User;
@@ -161,7 +161,7 @@ public class FrameMainMenu extends JFrame {
         if (frameGame == null) {
             frameGame = new FrameGame(userManager);
         }
-        frameGame.setMap( new JTableGameMap(LocationType.FS, "game.map", new MapCollection()), new WavPlayer());
+        frameGame.setMap(new JTableGameMap(LocationType.FS, "game.map", new MapCollection()), new WavPlayer());
         frameGame.showFrame(this);
     }//GEN-LAST:event_jbtnNewGameActionPerformed
 

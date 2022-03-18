@@ -4,14 +4,14 @@
  */
 package gui;
 
-import abstracts.AbstractMovingObject;
+import gameobjects.abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
-import interfaces.gamemaps.TimeMap;
-import objects.Goldman;
-import objects.listeners.MoveResultListener;
-import objects.sound.interfaces.SoundPlayer;
+import gamemap.interfaces.TimeMap;
+import gameobjects.impls.Goldman;
+import listeners.interfaces.MoveResultListener;
+import sound.interfaces.SoundPlayer;
 import user.AbstractUserManager;
 import utils.MessageManager;
 
