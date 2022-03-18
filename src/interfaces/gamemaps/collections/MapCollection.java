@@ -5,6 +5,7 @@ import abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
+import movestrategies.MoveStrategy;
 import objects.Coordinate;
 import objects.Goldman;
 import objects.Nothing;
@@ -52,7 +53,16 @@ public class MapCollection extends MapListenerRegistrator { // объекты д
     }
 
     @Override
-    public ActionResult moveObject(MovingDirection direction, GameObjectType gameObjectType) {
+    public void moveObject(MovingDirection direction, GameObjectType gameObjectType) {
+        doMoveAction(direction, gameObjectType, null);// движение по направлению (без стратегии)
+    }
+
+    @Override
+    public void moveObject(MoveStrategy moveStrategy, GameObjectType gameObjectType) {
+        doMoveAction(null, gameObjectType, moveStrategy);// движение по стратегии
+    }
+
+    private ActionResult doMoveAction(MovingDirection direction, GameObjectType gameObjectType, MoveStrategy moveStrategy) {
         Goldman goldman = (Goldman) getListOfDefinitObjects(GameObjectType.GOLDMAN).get(0);
 
         ActionResult actionResult = null;
@@ -61,11 +71,11 @@ public class MapCollection extends MapListenerRegistrator { // объекты д
             if (gameObject instanceof AbstractMovingObject) { //дорогостоящая операция
                 AbstractMovingObject movingObject = (AbstractMovingObject) gameObject;
 
-                if (direction == null) {
-                    direction = getRandomMoveDirection(movingObject);
+                if (moveStrategy != null){// если указана стратегия движения - то берем наравления оттуда
+                    direction = moveStrategy.getDirection(movingObject, goldman, this);
                 }
 
-                Coordinate newCoordinate = getNewCoordinate(direction, movingObject);
+                Coordinate newCoordinate = movingObject.getNewCoordinateInDirection(direction);
 
                 AbstractGameObject objectInNewCoordinate = getObjectByCoordinate(newCoordinate);
 
@@ -101,87 +111,6 @@ public class MapCollection extends MapListenerRegistrator { // объекты д
         }
     }
 
-    @Override
-    public void moveObjectRandom(GameObjectType objectType) {
-        moveObject(null, objectType);
-    }
-
-    private MovingDirection getRandomMoveDirection(AbstractMovingObject movingObject) {
-        Goldman goldman = (Goldman) getListOfDefinitObjects(GameObjectType.GOLDMAN).get(0);
-
-        MovingDirection direction = null;
-
-        int goldmanX = goldman.getCoordinate().getX();
-        int goldmanY = goldman.getCoordinate().getY();
-
-        int monsterX = movingObject.getCoordinate().getX();
-        int monsterY = movingObject.getCoordinate().getY();
-
-        int randomDirectionInt = getRandomInt(2);
-
-        if (randomDirectionInt == 1) { // 50 на 50 шанс двинуться по направлению к персонажу, 0 - к персонажу, 1 - от него
-            randomDirectionInt = getRandomInt(2); // рандомно определяем по какой оси двигаемся к персонажу
-            switch (randomDirectionInt) {
-                case 1: { //движемся к персонажу по X
-                    if (monsterX > goldmanX) {
-                        direction = MovingDirection.LEFT;
-                    } else {
-                        direction = MovingDirection.RIGHT;
-                    }
-                    break;
-                }
-                case 2: { // движемся к персонажу по Y
-                    if (monsterY > goldmanY) {
-                        direction = MovingDirection.UP;
-                    } else {
-                        direction = MovingDirection.DOWN;
-                    }
-                    break;
-                }
-            }
-        } else { // 1 - двигаться от персонажа
-            randomDirectionInt = getRandomInt(2); // по какой оси от персонажа - Х или У
-
-            switch (randomDirectionInt) {
-                case 1: { // по Х
-                    if (monsterX > goldmanX) {
-                        direction = MovingDirection.RIGHT;
-                    } else {
-                        direction = MovingDirection.LEFT;
-                    }
-                    break;
-                }
-                case 2: { // по У
-                    if (monsterY > goldmanY) {
-                        direction = MovingDirection.DOWN;
-                    } else {
-                        direction = MovingDirection.UP;
-                    }
-                    break;
-                }
-            }
-        }
-
-        return direction;
-    }
-
-    private Coordinate getNewCoordinate(MovingDirection direction, AbstractMovingObject movingObject) {
-        // берем текущие координаты объекта, которые нужно передвинуть
-        int x = movingObject.getCoordinate().getX();
-        int y = movingObject.getCoordinate().getY();
-
-        Coordinate newCoordinate = new Coordinate(x, y);
-
-        switch (direction) {
-            case UP -> newCoordinate.setXY(x, y - movingObject.getStep());
-            case DOWN -> newCoordinate.setXY(x, y + movingObject.getStep());
-            case RIGHT -> newCoordinate.setXY(x + movingObject.getStep(), y);
-            case LEFT -> newCoordinate.setXY(x - movingObject.getStep(), y);
-        }
-
-        return newCoordinate;
-    }
-
     private void swapObjects(AbstractGameObject obj1, AbstractGameObject obj2) {
         swapCoordinates(obj1, obj2);
 
@@ -193,11 +122,6 @@ public class MapCollection extends MapListenerRegistrator { // объекты д
         Coordinate tmpCoordinate = obj1.getCoordinate();
         obj1.setCoordinate(obj2.getCoordinate());
         obj2.setCoordinate(tmpCoordinate);
-    }
-
-    private int getRandomInt(int i) {
-        Random r = new Random();
-        return r.nextInt(i) + 1;
     }
 
 }

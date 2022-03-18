@@ -2,14 +2,18 @@ package gui.maps;
 
 import abstracts.AbstractGameMap;
 import abstracts.AbstractGameObject;
+import enums.ActionResult;
 import enums.GameObjectType;
 import interfaces.gamemaps.collections.GameCollection;
 import interfaces.gamemaps.DrawableMap;
 import enums.LocationType;
+import movestrategies.SlowMoving;
 import objects.Coordinate;
+import objects.Goldman;
 import objects.Nothing;
 import objects.Wall;
 import objects.creators.MapCreator;
+import objects.listeners.MoveResultListener;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -41,6 +45,7 @@ public class JTableGameMap implements DrawableMap {
         gameMap = MapCreator.getInstance().createMap(type, gameCollection);
         gameMap.loadMap(source);
 
+        timeMover = new TimeMover();
     }
 
     private void fillEmptyMap(int width, int height) {
@@ -112,16 +117,17 @@ public class JTableGameMap implements DrawableMap {
         return true;
     }
 
-    private TimeMover timeMover = new TimeMover();
+    private TimeMover timeMover;
 
-    private class TimeMover implements ActionListener {
+    private class TimeMover implements ActionListener, MoveResultListener {
 
         private Timer timer;
         private final static int MOVING_PAUSE = 500;
+        private final static int INIT_PAUSE = 1000;
 
         private TimeMover() {
             timer = new Timer(MOVING_PAUSE, this);
-            timer.setInitialDelay(0);
+            timer.setInitialDelay(INIT_PAUSE);
             timer.start();
         }
 
@@ -140,11 +146,15 @@ public class JTableGameMap implements DrawableMap {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            gameMap.getGameCollection().moveObjectRandom(GameObjectType.MONSTER);
+            gameMap.getGameCollection().moveObject(new SlowMoving(), GameObjectType.MONSTER);
+        }
+
+        @Override
+        public void notifyActionResult(ActionResult actionResult, Goldman goldman) {
+            switch (actionResult) {
+                case WIN, DIE -> timer.stop();
+            }
         }
     }
 
-    public TimeMover getTimeMover() {
-        return timeMover;
-    }
 }

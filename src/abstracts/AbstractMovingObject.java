@@ -3,6 +3,7 @@ package abstracts;
 import enums.ActionResult;
 import enums.MovingDirection;
 import interfaces.gameobjects.MovingObject;
+import objects.Coordinate;
 
 public abstract class AbstractMovingObject extends AbstractGameObject implements MovingObject {
 
@@ -48,4 +49,21 @@ public abstract class AbstractMovingObject extends AbstractGameObject implements
         return doAction(abstractGameObject);
     }
 
+    public Coordinate getNewCoordinateInDirection(MovingDirection direction) {
+
+        // берем текущие координаты объекта, которые нужно передвинуть
+        int x = this.getCoordinate().getX();
+        int y = this.getCoordinate().getY();
+
+        Coordinate newCoordinate = new Coordinate(x, y);
+
+        switch (direction) {
+            case UP -> newCoordinate.setXY(x, y - this.getStep());
+            case DOWN -> newCoordinate.setXY(x, y + this.getStep());
+            case RIGHT -> newCoordinate.setXY(x + this.getStep(), y);
+            case LEFT -> newCoordinate.setXY(x - this.getStep(), y);
+        }
+
+        return newCoordinate;
+    }
 }

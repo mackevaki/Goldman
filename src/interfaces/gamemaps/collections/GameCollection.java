@@ -4,6 +4,7 @@ import abstracts.AbstractGameObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
+import movestrategies.MoveStrategy;
 import objects.Coordinate;
 import objects.listeners.MoveResultNotifier;
 
@@ -21,7 +22,7 @@ public interface GameCollection extends MoveResultNotifier {
 
     AbstractGameObject getObjectByCoordinate(int x, int y);
 
-    ActionResult moveObject(MovingDirection direction, GameObjectType objectType);
+    void moveObject(MovingDirection direction, GameObjectType objectType);
 
-    void moveObjectRandom(GameObjectType objectType);
+    void moveObject(MoveStrategy moveStrategy, GameObjectType gameObjectType);
 }
