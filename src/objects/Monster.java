@@ -5,8 +5,8 @@ import abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
-import objects.sound.SoundObject;
-import objects.sound.SoundPlayer;
+import objects.sound.interfaces.SoundObject;
+import objects.sound.interfaces.SoundPlayer;
 
 /**
  * отвечает за работу объекта MONSTER

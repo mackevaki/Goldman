@@ -7,7 +7,10 @@ package gui;
 import enums.LocationType;
 import gui.maps.JTableGameMap;
 import interfaces.gamemaps.collections.MapCollection;
-import objects.sound.WavPlayer;
+import objects.sound.impls.WavPlayer;
+import user.AbstractUserManager;
+import user.DBUserManager;
+import user.User;
 
 import javax.swing.*;
 
@@ -21,8 +24,9 @@ public class FrameMainMenu extends JFrame {
     private FrameStat frameStat = new FrameStat();
     private FrameSavedGames frameLoadGame = new FrameSavedGames();
 
-    private JTableGameMap gameMap = new JTableGameMap(LocationType.FS, "game.map", new MapCollection());
-    
+    private AbstractUserManager userManager = new DBUserManager();
+    private CustomDialog usernameDialog;
+
     /**
      * Creates new form FrameMainMenu
      */
@@ -150,8 +154,12 @@ public class FrameMainMenu extends JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbtnNewGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnNewGameActionPerformed
+        if (createNewUser() == null) {
+            return;
+        }
+
         if (frameGame == null) {
-            frameGame = new FrameGame();
+            frameGame = new FrameGame(userManager);
         }
         frameGame.setMap( new JTableGameMap(LocationType.FS, "game.map", new MapCollection()), new WavPlayer());
         frameGame.showFrame(this);
@@ -212,4 +220,22 @@ public class FrameMainMenu extends JFrame {
     private javax.swing.JButton jbtnStatistics;
     private javax.swing.JPanel jpnlMainMenu;
     // End of variables declaration//GEN-END:variables
+
+    private User createNewUser() {
+        if (usernameDialog == null) {
+            usernameDialog = new CustomDialog(this, "Имя пользователя", "Введите имя: ", true);
+        }
+
+        usernameDialog.setVisible(true);
+
+        if (usernameDialog.getValidatedText() != null) {
+            userManager.createNewUser(usernameDialog.getValidatedText());
+            return userManager.getUser();
+        }
+
+        return null;
+    }
+
+
+
 }

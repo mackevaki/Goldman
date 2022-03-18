@@ -11,7 +11,7 @@ import objects.Goldman;
 import objects.Nothing;
 import objects.listeners.MapListenerRegistrator;
 import objects.listeners.MoveResultListener;
-import objects.sound.WavPlayer;
+import objects.sound.impls.WavPlayer;
 
 import java.util.*;
 

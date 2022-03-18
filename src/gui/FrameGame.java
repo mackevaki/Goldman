@@ -8,28 +8,27 @@ import abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
-import interfaces.gamemaps.DrawableMap;
+import interfaces.gamemaps.TimeMap;
 import objects.Goldman;
 import objects.listeners.MoveResultListener;
-import objects.sound.SoundPlayer;
+import objects.sound.interfaces.SoundPlayer;
+import user.AbstractUserManager;
 import utils.MessageManager;
 
-/**
- *
- * @author vojtech
- */
 public class FrameGame extends BaseChildFrame implements MoveResultListener {
-    private DrawableMap map; // передаем объект карты, которая умеет себя рисовать
+    private TimeMap map; // передаем объект карты, которая умеет себя рисовать
     private SoundPlayer soundPlayer;
+    private AbstractUserManager userManager;
 
     /**
      * Creates new form FrameGame
      */
-    public FrameGame() {
+    public FrameGame(AbstractUserManager userManager) {
+        this.userManager = userManager;
         initComponents();
     }
 
-    public void setMap(DrawableMap gameMap, SoundPlayer soundPlayer) {
+    public void setMap(TimeMap gameMap, SoundPlayer soundPlayer) {
         this.map = gameMap;
         gameMap.drawMap();
 
@@ -60,6 +59,7 @@ public class FrameGame extends BaseChildFrame implements MoveResultListener {
     protected void closeFrame() {
         super.closeFrame();
         soundPlayer.stopBackgroundMusic();
+        map.stop();
     }
 
     @Override
@@ -81,8 +81,8 @@ public class FrameGame extends BaseChildFrame implements MoveResultListener {
 
                 if (goldman.getTurnsNumber() >= map.getGameMap().getTimeLimit()) {
                     soundPlayer.stopBackgroundMusic();
-                    map.getGameMap().getGameCollection().notifyMoveListeners(ActionResult.DIE, goldman);
-                    //gameFinished(DIE_MESSAGE);
+                    //map.getGameMap().getGameCollection().notifyMoveListeners(ActionResult.DIE, goldman);
+                    gameFinished(DIE_MESSAGE);
                 }
             }
             case COLLECT_TREASURE -> jlabelScore.setText(String.valueOf(goldman.getTotalScore()));

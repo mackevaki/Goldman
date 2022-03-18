@@ -5,6 +5,7 @@ import abstracts.AbstractGameObject;
 import abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
+import interfaces.gamemaps.TimeMap;
 import interfaces.gamemaps.collections.GameCollection;
 import interfaces.gamemaps.DrawableMap;
 import enums.LocationType;
@@ -24,7 +25,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class JTableGameMap implements DrawableMap {
+public class JTableGameMap implements TimeMap {
 
     private JTable jTableMap = new JTable();
     private AbstractGameMap gameMap;
@@ -120,6 +121,16 @@ public class JTableGameMap implements DrawableMap {
     }
 
     private TimeMover timeMover;
+
+    @Override
+    public void start() {
+        timeMover.start();
+    }
+
+    @Override
+    public void stop() {
+        timeMover.stop();
+    }
 
     private class TimeMover implements ActionListener, MoveResultListener {
 
