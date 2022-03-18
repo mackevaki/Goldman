@@ -5,11 +5,13 @@ import abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
+import objects.sound.SoundObject;
+import objects.sound.WavPlayer;
 
 /**
  * отвечает за работу объекта MONSTER
  */
-public class Monster extends AbstractMovingObject {
+public class Monster extends AbstractMovingObject implements SoundObject {
 
     public Monster(Coordinate coordinate) {
         super.setCoordinate(coordinate);
@@ -43,5 +45,16 @@ public class Monster extends AbstractMovingObject {
         }
 
         return super.doAction(gameObject);
+    }
+
+    @Override
+    public String getSoundName(ActionResult actionResult) {
+        switch (actionResult) {
+            case DIE -> {
+                return WavPlayer.WAV_DIE;
+            }
+        }
+
+        return null;
     }
 }

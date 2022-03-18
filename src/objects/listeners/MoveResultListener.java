@@ -1,9 +1,9 @@
 package objects.listeners;
 
+import abstracts.AbstractMovingObject;
 import enums.ActionResult;
-import objects.Goldman;
 
 public interface MoveResultListener {
 
-    void notifyActionResult(ActionResult actionResult, Goldman goldman);
+    void notifyActionResult(ActionResult actionResult, AbstractMovingObject movingObject);
 }

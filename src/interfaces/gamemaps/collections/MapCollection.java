@@ -11,6 +11,7 @@ import objects.Goldman;
 import objects.Nothing;
 import objects.listeners.MapListenerRegistrator;
 import objects.listeners.MoveResultListener;
+import objects.sound.WavPlayer;
 
 import java.util.*;
 
@@ -18,6 +19,10 @@ public class MapCollection extends MapListenerRegistrator { // объекты д
 
     private HashMap<Coordinate, AbstractGameObject> gameObjects = new HashMap<>(); // хранит все объекты с доступом по координатам
     private EnumMap<GameObjectType, ArrayList<AbstractGameObject>> typeObjects = new EnumMap<>(GameObjectType.class); // хранит список объектов для каждого типа
+
+    public MapCollection() {
+        addMoveListener(new WavPlayer());
+    }
 
     @Override
     public void addGameObject(AbstractGameObject gameObject) {
@@ -105,9 +110,9 @@ public class MapCollection extends MapListenerRegistrator { // объекты д
     }
 
     @Override
-    public void notifyMoveListeners(ActionResult actionResult, Goldman goldman) {
+    public void notifyMoveListeners(ActionResult actionResult, AbstractMovingObject movingObject) {
         for (MoveResultListener listener : getMoveListeners()) {
-            listener.notifyActionResult(actionResult, goldman);
+            listener.notifyActionResult(actionResult, movingObject);
         }
     }
 

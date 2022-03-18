@@ -2,11 +2,13 @@ package gui.maps;
 
 import abstracts.AbstractGameMap;
 import abstracts.AbstractGameObject;
+import abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import interfaces.gamemaps.collections.GameCollection;
 import interfaces.gamemaps.DrawableMap;
 import enums.LocationType;
+import movestrategies.AgressiveMoving;
 import movestrategies.SlowMoving;
 import objects.Coordinate;
 import objects.Goldman;
@@ -129,6 +131,7 @@ public class JTableGameMap implements DrawableMap {
             timer = new Timer(MOVING_PAUSE, this);
             timer.setInitialDelay(INIT_PAUSE);
             timer.start();
+            gameMap.getGameCollection().addMoveListener(this);
         }
 
         public void start() {
@@ -146,11 +149,11 @@ public class JTableGameMap implements DrawableMap {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            gameMap.getGameCollection().moveObject(new SlowMoving(), GameObjectType.MONSTER);
+            gameMap.getGameCollection().moveObject(new AgressiveMoving(), GameObjectType.MONSTER);
         }
 
         @Override
-        public void notifyActionResult(ActionResult actionResult, Goldman goldman) {
+        public void notifyActionResult(ActionResult actionResult, AbstractMovingObject movingObject) {
             switch (actionResult) {
                 case WIN, DIE -> timer.stop();
             }

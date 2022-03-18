@@ -1,5 +1,6 @@
 package objects.listeners;
 
+import abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import objects.Goldman;
 
@@ -15,6 +16,6 @@ public interface MoveResultNotifier {
 
     void removeAllMoveListeners();
 
-     void notifyMoveListeners(ActionResult actionResult, Goldman goldman);
+     void notifyMoveListeners(ActionResult actionResult, AbstractMovingObject movingObject);
 
 }

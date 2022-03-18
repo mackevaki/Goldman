@@ -4,6 +4,7 @@
  */
 package gui;
 
+import abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
@@ -42,33 +43,47 @@ public class FrameGame extends BaseChildFrame implements MoveResultListener {
         map.getGameMap().getGameCollection().moveObject(direction, gameObjectType);
     }
 
-    private void gameOver() {
-        MessageManager.showInformMessage(null, "Вы проиграли");
+    private void gameFinished(String message) {
+        MessageManager.showInformMessage(null, message);
         closeFrame();
     }
 
+    private static final String DIE_MESSAGE = "Вы проиграли!";
+    private static final String WIN_MESSAGE = "Вы выиграли! Количество очков: ";
+
     @Override
-    public void notifyActionResult(ActionResult actionResult, Goldman goldman) {
+    public void notifyActionResult(ActionResult actionResult, AbstractMovingObject movingObject) {
+        if (movingObject.getType().equals(GameObjectType.GOLDMAN)) {
+            Goldman goldMan = (Goldman) movingObject;
+            checkGoldmanActions(actionResult, goldMan);
+        }
+
+        checkCommonActions(actionResult);
+
+        map.drawMap();
+    }
+
+    private void checkGoldmanActions(ActionResult actionResult, Goldman goldman) {
         switch (actionResult) {
             case MOVE -> {
                 jlabelTurnsLeft.setText(String.valueOf(map.getGameMap().getTimeLimit() - goldman.getTurnsNumber()));
 
                 if (goldman.getTurnsNumber() >= map.getGameMap().getTimeLimit()) {
-                    gameOver();
+                    gameFinished(DIE_MESSAGE);
                 }
-            }
-            case DIE -> {
-                gameOver();
             }
             case COLLECT_TREASURE -> jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
             case WIN -> {
                 jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
-                MessageManager.showInformMessage(null, "Вы выиграли! Количествол набранных очков: " + goldman.getTotalScore());
-                closeFrame();
+                gameFinished(WIN_MESSAGE + goldman.getTotalScore());
             }
         }
+    }
 
-        map.drawMap();
+    private void checkCommonActions(ActionResult actionResult) {
+        switch (actionResult) {
+            case DIE -> gameFinished(DIE_MESSAGE);
+        }
     }
 
     /**
