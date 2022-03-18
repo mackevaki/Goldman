@@ -6,7 +6,7 @@ import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
 import objects.sound.SoundObject;
-import objects.sound.WavPlayer;
+import objects.sound.SoundPlayer;
 
 /**
  * класс отвечает за работу объекта GOLDMAN - главный персонаж игры
@@ -81,13 +81,13 @@ public class Goldman extends AbstractMovingObject implements SoundObject {
     public String getSoundName(ActionResult actionResult) {
         switch (actionResult) {
             case DIE -> {
-                return WavPlayer.WAV_DIE;
+                return SoundPlayer.WAV_DIE;
             }
             case WIN ->{
-                return WavPlayer.WAV_WIN;
+                return SoundPlayer.WAV_WIN;
             }
             case COLLECT_TREASURE -> {
-                return WavPlayer.WAV_TREASURE;
+                return SoundPlayer.WAV_TREASURE;
             }
         }
 

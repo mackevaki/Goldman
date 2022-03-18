@@ -6,7 +6,7 @@ import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
 import objects.sound.SoundObject;
-import objects.sound.WavPlayer;
+import objects.sound.SoundPlayer;
 
 /**
  * отвечает за работу объекта MONSTER
@@ -51,7 +51,7 @@ public class Monster extends AbstractMovingObject implements SoundObject {
     public String getSoundName(ActionResult actionResult) {
         switch (actionResult) {
             case DIE -> {
-                return WavPlayer.WAV_DIE;
+                return SoundPlayer.WAV_DIE;
             }
         }
 

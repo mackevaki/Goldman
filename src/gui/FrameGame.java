@@ -11,6 +11,7 @@ import enums.MovingDirection;
 import interfaces.gamemaps.DrawableMap;
 import objects.Goldman;
 import objects.listeners.MoveResultListener;
+import objects.sound.SoundPlayer;
 import utils.MessageManager;
 
 /**
@@ -19,6 +20,7 @@ import utils.MessageManager;
  */
 public class FrameGame extends BaseChildFrame implements MoveResultListener {
     private DrawableMap map; // передаем объект карты, которая умеет себя рисовать
+    private SoundPlayer soundPlayer;
 
     /**
      * Creates new form FrameGame
@@ -27,9 +29,12 @@ public class FrameGame extends BaseChildFrame implements MoveResultListener {
         initComponents();
     }
 
-    public void setMap(DrawableMap gameMap) {
+    public void setMap(DrawableMap gameMap, SoundPlayer soundPlayer) {
         this.map = gameMap;
         gameMap.drawMap();
+
+        this.soundPlayer = soundPlayer;
+        this.soundPlayer.startBackgroundMusic("background.wav");
 
         gameMap.getGameMap().getGameCollection().addMoveListener(this);
 
@@ -52,6 +57,12 @@ public class FrameGame extends BaseChildFrame implements MoveResultListener {
     private static final String WIN_MESSAGE = "Вы выиграли! Количество очков: ";
 
     @Override
+    protected void closeFrame() {
+        super.closeFrame();
+        soundPlayer.stopBackgroundMusic();
+    }
+
+    @Override
     public void notifyActionResult(ActionResult actionResult, AbstractMovingObject movingObject) {
         if (movingObject.getType().equals(GameObjectType.GOLDMAN)) {
             Goldman goldMan = (Goldman) movingObject;
@@ -69,12 +80,15 @@ public class FrameGame extends BaseChildFrame implements MoveResultListener {
                 jlabelTurnsLeft.setText(String.valueOf(map.getGameMap().getTimeLimit() - goldman.getTurnsNumber()));
 
                 if (goldman.getTurnsNumber() >= map.getGameMap().getTimeLimit()) {
-                    gameFinished(DIE_MESSAGE);
+                    soundPlayer.stopBackgroundMusic();
+                    map.getGameMap().getGameCollection().notifyMoveListeners(ActionResult.DIE, goldman);
+                    //gameFinished(DIE_MESSAGE);
                 }
             }
             case COLLECT_TREASURE -> jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
             case WIN -> {
                 jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
+                soundPlayer.stopBackgroundMusic();
                 gameFinished(WIN_MESSAGE + goldman.getTotalScore());
             }
         }
@@ -82,7 +96,10 @@ public class FrameGame extends BaseChildFrame implements MoveResultListener {
 
     private void checkCommonActions(ActionResult actionResult) {
         switch (actionResult) {
-            case DIE -> gameFinished(DIE_MESSAGE);
+            case DIE -> {
+                soundPlayer.stopBackgroundMusic();
+                gameFinished(DIE_MESSAGE);
+            }
         }
     }
 
