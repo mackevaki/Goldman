@@ -4,18 +4,34 @@
  */
 package gui;
 
+import gamemap.loader.abstracts.AbstractMapLoader;
+import models.SavedGamesTableModel;
+import objects.MapInfo;
+import objects.SavedMapInfo;
+import utils.MessageManager;
+
+import javax.swing.*;
+import java.util.ArrayList;
+
 /**
  *
  * @author vojtech
  */
 public class FrameSavedGames extends BaseChildFrame {
+    private AbstractMapLoader mapLoader;
+    private SavedGamesTableModel model;
+    private FrameGame frameGame;
+    private ArrayList<SavedMapInfo> list;
 
     /**
      * Creates new form FrameSavedGames
      */
-    public FrameSavedGames() {
+    public FrameSavedGames(AbstractMapLoader mapLoader, FrameGame frameGame) {
         initComponents();
+        this.mapLoader = mapLoader;
+        this.frameGame = frameGame;
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -118,11 +134,45 @@ public class FrameSavedGames extends BaseChildFrame {
     }//GEN-LAST:event_jbtnReturnActionPerformed
 
     private void jbtnLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnLoadActionPerformed
-        // TODO add your handling code here:
+        int index = jTable1.getSelectedRow();
+        
+        if (index < 0) {
+            return;
+        }
+        
+        MapInfo mapInfo = model.getMapInfo(index);
+        
+        mapLoader.loadMap(mapInfo);
+        
+        closeFrame();
+        
+        frameGame.showFrame(getParentFrame());
     }//GEN-LAST:event_jbtnLoadActionPerformed
 
     private void jbtnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnDeleteActionPerformed
-        // TODO add your handling code here:
+        int index = jTable1.getSelectedRow();
+
+        if (index < 0) {
+            return;
+        }
+
+        int result = MessageManager.showYesNoMessage(this, "Подтверждаете удаление?");
+        switch (result) {
+            case JOptionPane.YES_OPTION: {
+
+                MapInfo mapInfo = model.getMapInfo(index);
+
+                mapLoader.deleteSavedMap(mapInfo);
+
+                model.deleteMapInfo(index);
+                model.refresh();
+
+                break;
+            }
+            case JOptionPane.NO_OPTION:
+            case JOptionPane.CANCEL_OPTION:
+
+        }
     }//GEN-LAST:event_jbtnDeleteActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -132,4 +182,21 @@ public class FrameSavedGames extends BaseChildFrame {
     private javax.swing.JButton jbtnLoad;
     private javax.swing.JButton jbtnReturn;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    protected void showFrame(JFrame parent) {
+        list = mapLoader.getSavedMapList(mapLoader.getGameMap().getMapInfo().getUser());
+
+        model = new SavedGamesTableModel(list);
+
+        jTable1.setModel(model);
+
+        jTable1.setRowHeight(40);
+
+        super.showFrame(parent);
+
+        if (list.isEmpty()) {
+            MessageManager.showErrorMessage(this, "Сохраненных игр не найдено!");
+        }
+    }
 }

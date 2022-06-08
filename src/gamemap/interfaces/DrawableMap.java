@@ -1,18 +1,14 @@
 package gamemap.interfaces;
 
-import gamemap.abstracts.AbstractGameMap;
-
 import java.awt.*;
 
 /**
  * Интерфейс для отображения карты
  */
-public interface DrawableMap {
+public interface DrawableMap  extends MainMap {
 
-    Component getMap();
+    Component getMapComponent();
 
     boolean drawMap();
-
-    AbstractGameMap getGameMap();
 
     }

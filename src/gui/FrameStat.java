@@ -4,17 +4,29 @@
  */
 package gui;
 
+import models.ScoreTableModel;
+import score.objects.UserScore;
+
+import javax.swing.*;
+import java.util.ArrayList;
+
 /**
  *
  * @author vojtech
  */
 public class FrameStat extends BaseChildFrame {
 
+    private ArrayList<UserScore> list;
+
     /**
      * Creates new form FrameStat
      */
     public FrameStat() {
         initComponents();
+    }
+
+    public void setList(ArrayList<UserScore> list) {
+        this.list = list;
     }
 
     /**
@@ -80,6 +92,8 @@ public class FrameStat extends BaseChildFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+
+
     private void jbtnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnReturnActionPerformed
         closeFrame();
     }//GEN-LAST:event_jbtnReturnActionPerformed
@@ -90,4 +104,13 @@ public class FrameStat extends BaseChildFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JButton jbtnReturn;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    protected void showFrame(JFrame parent) {
+
+        jTable1.setModel(new ScoreTableModel(list));
+        jTable1.setRowHeight(40);
+
+        super.showFrame(parent);
+    }
 }

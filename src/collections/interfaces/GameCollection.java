@@ -24,4 +24,7 @@ public interface GameCollection extends MoveResultNotifier {
     void moveObject(MovingDirection direction, GameObjectType objectType);
 
     void moveObject(MoveStrategy moveStrategy, GameObjectType gameObjectType);
+
+    void clear();
+
 }

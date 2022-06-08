@@ -1,19 +1,16 @@
 package gamemap.impls;
 
-import gamemap.abstracts.AbstractGameMap;
-import gameobjects.abstracts.AbstractGameObject;
-import gameobjects.abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
+import gamemap.abstracts.AbstractGameMap;
 import gamemap.interfaces.TimeMap;
-import collections.interfaces.GameCollection;
-import enums.LocationType;
-import movestrategies.impls.AggressiveMoving;
+import gameobjects.abstracts.AbstractGameObject;
+import gameobjects.abstracts.AbstractMovingObject;
 import gameobjects.impls.Coordinate;
 import gameobjects.impls.Nothing;
 import gameobjects.impls.Wall;
-import creators.MapCreator;
 import listeners.interfaces.MoveResultListener;
+import movestrategies.impls.AggressiveMoving;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -22,30 +19,29 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class JTableGameMap implements TimeMap {
+public class JTableGameMap extends AbstractGameMap implements TimeMap {
 
-    private JTable jTableMap = new JTable();
-    private AbstractGameMap gameMap;
-    private String[] columnNames;
+    private transient JTable jTableMap = new JTable();
+    private transient TimeMover timeMover = new TimeMover();
+    private transient String[] columnNames;
     // объекты для отображения на карте будут храниться в двумерном массиве типа AbstractGameObject
     // каждый элемент массива будет обозначаться согласно текстовому представлению объекта как описано в GameObjectType
-    private AbstractGameObject[][] mapObjects;
+    private transient AbstractGameObject[][] mapObjects;
 
-    public JTableGameMap(LocationType type, Object source, GameCollection gameCollection) {
-        jTableMap.setEnabled(false); // отображение карты в таблице не кликабельно
-        jTableMap.setSize(new Dimension(300, 300));
-        jTableMap.setRowHeight(26);
-        jTableMap.setRowSelectionAllowed(false);
-        jTableMap.setShowHorizontalLines(false);
-        jTableMap.setShowVerticalLines(false);
-        jTableMap.setTableHeader(null);
-        jTableMap.setUpdateSelectionOnSort(false); //???
-        jTableMap.setVerifyInputWhenFocusTarget(false); // ???
-
-        gameMap = MapCreator.getInstance().createMap(type, gameCollection);
-        gameMap.loadMap(source);
-
-        timeMover = new TimeMover();
+    public JTableGameMap() {
+        try {
+            jTableMap.setEnabled(false); // отображение карты в таблице не кликабельно
+            jTableMap.setSize(new Dimension(300, 300));
+            jTableMap.setRowHeight(26);
+            jTableMap.setRowSelectionAllowed(false);
+            jTableMap.setShowHorizontalLines(false);
+            jTableMap.setShowVerticalLines(false);
+            jTableMap.setTableHeader(null);
+            jTableMap.setUpdateSelectionOnSort(false); //???
+            jTableMap.setVerifyInputWhenFocusTarget(false); // ???
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void fillEmptyMap(int width, int height) {
@@ -57,19 +53,19 @@ public class JTableGameMap implements TimeMap {
     }
 
     public void updateObjectsArray() {
-        mapObjects = new AbstractGameObject[gameMap.getHeight()][gameMap.getWidth()];
-        fillEmptyMap(gameMap.getWidth(), gameMap.getHeight());
+        mapObjects = new AbstractGameObject[mapInfo.getHeight()][mapInfo.getWidth()];
+        fillEmptyMap(mapInfo.getWidth(), mapInfo.getHeight());
 
         // потом заполнить массив объектами
         for (AbstractGameObject obj :
-                gameMap.getGameCollection().getAllGameObjects()) {
+                getGameCollection().getAllGameObjects()) {
             if (!obj.getType().equals(GameObjectType.NOTHING)) { // пустоты не добавляем, так как они уже добавились при вызове метода fillEmptyMap
                 int y = obj.getCoordinate().getY();
                 int x = obj.getCoordinate().getX();
                 if (!(mapObjects[y][x] instanceof Nothing) & // если в этих координатах уже есть какой-то объект, отличный от стены и пустоты
                         !((mapObjects[y][x]) instanceof Wall)) {
                     AbstractGameObject tmpObj = mapObjects[y][x];
-                    mapObjects[y][x] = gameMap.getObjectPriority(tmpObj, obj);
+                    mapObjects[y][x] = getObjectPriority(tmpObj, obj);
                 } else {
                     mapObjects[y][x] = obj;
                 }
@@ -79,12 +75,8 @@ public class JTableGameMap implements TimeMap {
     }
 
     @Override
-    public Component getMap() {
+    public Component getMapComponent() {
         return jTableMap;
-    }
-
-    public AbstractGameMap getGameMap() {
-        return gameMap;
     }
 
     @Override
@@ -94,7 +86,7 @@ public class JTableGameMap implements TimeMap {
 
         try {
             // присваиваем пустоту всем заголовкам столбцов, чтобы у таблицы не было заголовоков, а то некрасиво смотрится
-            columnNames = new String[gameMap.getWidth()];
+            columnNames = new String[mapInfo.getWidth()];
             for (int i = 0; i < columnNames.length; i++) {
                 columnNames[i] = "";
             }
@@ -117,8 +109,6 @@ public class JTableGameMap implements TimeMap {
         return true;
     }
 
-    private TimeMover timeMover;
-
     @Override
     public void start() {
         timeMover.start();
@@ -139,7 +129,7 @@ public class JTableGameMap implements TimeMap {
             timer = new Timer(MOVING_PAUSE, this);
             timer.setInitialDelay(INIT_PAUSE);
             timer.start();
-            gameMap.getGameCollection().addMoveListener(this);
+            getGameCollection().addMoveListener(this);
         }
 
         public void start() {
@@ -157,7 +147,7 @@ public class JTableGameMap implements TimeMap {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            gameMap.getGameCollection().moveObject(new AggressiveMoving(), GameObjectType.MONSTER);
+            getGameCollection().moveObject(new AggressiveMoving(), GameObjectType.MONSTER);
         }
 
         @Override

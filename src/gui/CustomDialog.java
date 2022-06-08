@@ -30,6 +30,12 @@ public class CustomDialog extends javax.swing.JDialog implements ActionListener,
         return typedText;
     }
 
+    public void setUserName(String username) {
+        textField.setText(username);
+        textField.selectAll();
+        textField.requestFocus();
+    }
+
     public CustomDialog(java.awt.Frame parent, String title, String message, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -40,9 +46,7 @@ public class CustomDialog extends javax.swing.JDialog implements ActionListener,
 
         Object[] array = {message, textField};
 
-
         Object[] options = {OK_BUTTON, CANCEL_BUTTON};
-
 
         optionPane = new JOptionPane(array,
                 JOptionPane.QUESTION_MESSAGE,
@@ -51,9 +55,7 @@ public class CustomDialog extends javax.swing.JDialog implements ActionListener,
                 options,
                 options[0]);
 
-
         setContentPane(optionPane);
-
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {

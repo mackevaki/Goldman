@@ -1,21 +1,28 @@
 package gameobjects.impls;
 
-import gameobjects.abstracts.AbstractGameObject;
-import gameobjects.abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
+import gameobjects.abstracts.AbstractGameObject;
+import gameobjects.abstracts.AbstractSoundObject;
+import sound.impls.WavPlayer;
 import sound.interfaces.SoundObject;
-import sound.interfaces.SoundPlayer;
+
+import javax.sound.sampled.Clip;
 
 /**
  * класс отвечает за работу объекта GOLDMAN - главный персонаж игры
  */
-public class Goldman extends AbstractMovingObject implements SoundObject {
+public class Goldman extends AbstractSoundObject implements SoundObject {
     
     private int totalScore = 0; // количество собранных игроком очков
     private int turnsNumber = 0; // количество сделанных ходов
-    
+
+    private transient Clip moveClip;
+    private transient Clip treasureClip;
+    private transient Clip winClip;
+
+
     public Goldman(Coordinate coordinate) {
         super.setCoordinate(coordinate);
         super.setType(GameObjectType.GOLDMAN);
@@ -78,16 +85,28 @@ public class Goldman extends AbstractMovingObject implements SoundObject {
     }
 
     @Override
-    public String getSoundName(ActionResult actionResult) {
+    public Clip getSoundClip(ActionResult actionResult) {
+//        if (moveClip ==null) {
+//            moveClip = openClip(WavPlayer.WAV_MOVE);
+//        }
+
+        if (treasureClip == null) {
+            treasureClip = openClip(WavPlayer.WAV_TREASURE);
+        }
+
+        if (winClip ==null) {
+            winClip = openClip(WavPlayer.WAV_WIN);
+        }
+
         switch (actionResult) {
             case DIE -> {
-                return SoundPlayer.WAV_DIE;
+                return super.getDieClip();
             }
             case WIN ->{
-                return SoundPlayer.WAV_WIN;
+                return winClip;
             }
             case COLLECT_TREASURE -> {
-                return SoundPlayer.WAV_TREASURE;
+                return treasureClip;
             }
         }
 

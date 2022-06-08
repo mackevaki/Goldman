@@ -2,7 +2,9 @@ package sound.interfaces;
 
 import enums.ActionResult;
 
+import javax.sound.sampled.Clip;
+
 public interface SoundObject {
 
-    String getSoundName(ActionResult actionResult);
+    Clip getSoundClip(ActionResult actionResult);
 }

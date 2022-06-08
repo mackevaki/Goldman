@@ -22,7 +22,6 @@ public abstract class AbstractMovingObject extends AbstractGameObject implements
     protected void actionBeforeMove(MovingDirection direction) {
         // при движении объект должен сменить иконку и произвести звук
         changeIcon(direction);
-        // playSound();
     }
 
     /**

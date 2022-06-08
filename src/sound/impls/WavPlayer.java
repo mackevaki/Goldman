@@ -1,26 +1,30 @@
 package sound.impls;
 
-import gameobjects.abstracts.AbstractMovingObject;
 import enums.ActionResult;
+import gameobjects.abstracts.AbstractMovingObject;
 import listeners.interfaces.MoveResultListener;
 import sound.interfaces.SoundObject;
 import sound.interfaces.SoundPlayer;
 
 import javax.sound.sampled.*;
-import javax.swing.*;
 import java.io.IOException;
-import java.net.URL;
 
 public class WavPlayer implements MoveResultListener, SoundPlayer {
+    public static final String WAV_DIE = "die.wav";
+    public static final String WAV_WIN = "win.wav";
+    public static final String WAV_TREASURE = "treasure.wav";
+    public static final String WAV_BACKGROUND = "background.wav";
+    public static final String SOUND_PATH = "/sound/sounds/";
 
     private Clip backgroundClip;
-    private Clip moveClip;
 
     public WavPlayer() {
+        AudioInputStream ais = null;
         try {
             backgroundClip = AudioSystem.getClip();
-            moveClip = AudioSystem.getClip();
-        } catch (LineUnavailableException e) {
+            ais = AudioSystem.getAudioInputStream(this.getClass().getResource(WavPlayer.SOUND_PATH + WAV_BACKGROUND));
+            backgroundClip.open(ais);
+        } catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -29,83 +33,46 @@ public class WavPlayer implements MoveResultListener, SoundPlayer {
     public void notifyActionResult(ActionResult actionResult, final AbstractMovingObject movingObject) {
         if (!(movingObject instanceof SoundObject)) return;
 
-        if (actionResult.equals(ActionResult.DIE) || actionResult.equals(ActionResult.WIN)) stopBackgroundMusic();
-
         SoundObject soundObject = (SoundObject) movingObject;
 
-        playSound(soundObject.getSoundName(actionResult), false, moveClip, true);
+        Clip clip = soundObject.getSoundClip(actionResult);
+
+        playSound(clip, false);
     }
 
     @Override
-    public void playSound(String name, final boolean loop) {
-        try {
-            playSound(name, loop, AudioSystem.getClip(), false);
-        } catch (LineUnavailableException e) {
-            e.printStackTrace();
-        }
+    public void playSound(final Clip clip, final boolean loop) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (clip == null) return;
+
+                clip.setFramePosition(0);
+
+                if (loop) {
+                    clip.loop(Clip.LOOP_CONTINUOUSLY);
+                } else {
+                    if (clip.isRunning()) {
+                        clip.stop();
+                    }
+                    clip.start();
+                }
+            }
+        });
+
+        thread.setDaemon(true);
+        thread.start();
     }
 
     @Override
     public void startBackgroundMusic(String soundName) {
-        playSound(soundName, true, backgroundClip, false);
+        playSound(backgroundClip, true);
     }
 
     @Override
     public void stopBackgroundMusic() {
-        backgroundClip.stop();
-        backgroundClip.close();
-    }
-
-    /**
-     * @param name - sound's name
-     * @param loop - necessity to play sound on repeat
-     * @param stopPrev - necessity to stop previous sound before playing current sound
-     */
-    private void playSound(String name, final boolean loop, final Clip clip, boolean stopPrev) {
-        try {
-            if (name == null) {
-                return;
-            }
-
-            URL sound = this.getClass().getResource("/sound/sounds/" + name);
-
-            final AudioInputStream ais = AudioSystem.getAudioInputStream(sound);
-
-            // запускаем звук в параллельном потоке, чтобы, когда звук проигрывается,
-            // мы могли дальше передвигать нашего персонажа
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (stopPrev && clip != null) {
-                            clip.stop();
-                            clip.close();
-                        }
-
-                        clip.open(ais);
-
-                        if (loop) {
-                            clip.loop(Clip.LOOP_CONTINUOUSLY);
-                        } else {
-                            clip.start();
-                        }
-
-
-                    } catch (LineUnavailableException | IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (ais != null) {
-                            try {
-                                ais.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            });
-        } catch (UnsupportedAudioFileException | IOException e) {
-            e.printStackTrace();
+        if (backgroundClip != null && backgroundClip.isRunning()) {
+            backgroundClip.stop();
         }
     }
 }

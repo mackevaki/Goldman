@@ -1,17 +1,15 @@
 package gamemap.interfaces;
 
+import collections.interfaces.GameCollection;
+import objects.MapInfo;
+
 /**
  * Интерфейс для создания игровой карты (задает поведение любой карты)
  */
 public interface MainMap {
 
-    int getWidth();
+    MapInfo getMapInfo();
 
-    int getHeight();
+    GameCollection getGameCollection(); // все карты должны хранить коллекцию объектов
 
-    boolean loadMap(Object source);
-
-    boolean saveMap(Object source);
-
-    int getTimeLimit();
 }

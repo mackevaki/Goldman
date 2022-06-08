@@ -13,9 +13,10 @@ import collections.abstracts.MapMoveListenerRegistrator;
 import listeners.interfaces.MoveResultListener;
 import sound.impls.WavPlayer;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class MapCollection extends MapMoveListenerRegistrator { // объекты для карты, которые умеют уведомлять всех слушателей о своих ходах
+public class MapCollection extends MapMoveListenerRegistrator implements Serializable { // объекты для карты, которые умеют уведомлять всех слушателей о своих ходах
 
     private HashMap<Coordinate, AbstractGameObject> gameObjects = new HashMap<>(); // хранит все объекты с доступом по координатам
     private EnumMap<GameObjectType, ArrayList<AbstractGameObject>> typeObjects = new EnumMap<>(GameObjectType.class); // хранит список объектов для каждого типа
@@ -127,6 +128,12 @@ public class MapCollection extends MapMoveListenerRegistrator { // объект�
         Coordinate tmpCoordinate = obj1.getCoordinate();
         obj1.setCoordinate(obj2.getCoordinate());
         obj2.setCoordinate(tmpCoordinate);
+    }
+
+    @Override
+    public void clear() {
+        gameObjects.clear();
+        typeObjects.clear();
     }
 
 }

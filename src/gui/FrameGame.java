@@ -4,6 +4,8 @@
  */
 package gui;
 
+import gamemap.abstracts.AbstractGameMap;
+import gamemap.loader.abstracts.AbstractMapLoader;
 import gameobjects.abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
@@ -11,85 +13,123 @@ import enums.MovingDirection;
 import gamemap.interfaces.TimeMap;
 import gameobjects.impls.Goldman;
 import listeners.interfaces.MoveResultListener;
+import objects.MapInfo;
+import objects.SavedMapInfo;
+import score.interfaces.ScoreSaver;
+import score.objects.UserScore;
+import sound.impls.WavPlayer;
 import sound.interfaces.SoundPlayer;
-import user.AbstractUserManager;
 import utils.MessageManager;
 
-public class FrameGame extends BaseChildFrame implements MoveResultListener {
-    private TimeMap map; // передаем объект карты, которая умеет себя рисовать
+import javax.swing.*;
+
+public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
+    public static final String SAVE_GAME_BEFORE_EXIT = "Сохранить игру перед выходом?";
+    private static final String MESSAGE_SAVED_SUCCESS = "Игра сохранена!";
+    private static final String MESSAGE_DIE = "Вы проиграли!";
+    private static final String MESSAGE_WIN = "Вы выиграли! Количество очков: ";
+    // был тайммеп, перенесли функционала из гейммепа в меплоадер - по загрузке мапы из файла или бд
+    private AbstractGameMap gameMap; // передаем объект карты, которая умеет себя рисовать
     private SoundPlayer soundPlayer;
-    private AbstractUserManager userManager;
+    private ScoreSaver scoreSaver;
+    private MapInfo mapInfo;
+    private AbstractMapLoader mapLoader;
 
     /**
      * Creates new form FrameGame
      */
-    public FrameGame(AbstractUserManager userManager) {
-        this.userManager = userManager;
+    public FrameGame(ScoreSaver scoreSaver, AbstractMapLoader mapLoader, SoundPlayer soundPlayer) {
+        this.mapLoader = mapLoader;
+        this.scoreSaver = scoreSaver;
+        this.soundPlayer = soundPlayer;
         initComponents();
     }
 
-    public void setMap(TimeMap gameMap, SoundPlayer soundPlayer) {
-        this.map = gameMap;
+    public void initMap() {
+        this.gameMap = mapLoader.getGameMap();
         gameMap.drawMap();
 
-        this.soundPlayer = soundPlayer;
-        this.soundPlayer.startBackgroundMusic("background.wav");
+        // слушатели для звуков должны идти в первую очередь, т.к. они запускаются в отдельном потоке и не мешают выполняться следующим слушателям
+        if (soundPlayer instanceof MoveResultListener) {
+            mapLoader.getGameMap().getGameCollection().addMoveListener((MoveResultListener) soundPlayer);
+        }
 
-        gameMap.getGameMap().getGameCollection().addMoveListener(this);
+        gameMap.getGameCollection().addMoveListener(this);
 
-        jlabelTurnsLeft.setText(String.valueOf(gameMap.getGameMap().getTimeLimit()));
         jPanelMap.removeAll();
-        jPanelMap.add(gameMap.getMap());
+        jPanelMap.add(mapLoader.getGameMap().getMapComponent());
+
+        mapInfo = gameMap.getMapInfo();
+
+        jlabelTurnsLeft.setText(String.valueOf(getTurnsLeftCount()));
+        jlabelScore.setText(String.valueOf(getTotalScore()));
+
+        startGame();
+
     }
 
 
     private void moveGameObject(MovingDirection direction, GameObjectType gameObjectType) {
-        map.getGameMap().getGameCollection().moveObject(direction, gameObjectType);
+        gameMap.getGameCollection().moveObject(direction, gameObjectType);
     }
 
     private void gameFinished(String message) {
+        stopGame();
         MessageManager.showInformMessage(null, message);
         closeFrame();
     }
 
-    private static final String DIE_MESSAGE = "Вы проиграли!";
-    private static final String WIN_MESSAGE = "Вы выиграли! Количество очков: ";
+    private void startGame() {
+        soundPlayer.startBackgroundMusic(WavPlayer.WAV_BACKGROUND);
+        mapLoader.getGameMap().start();
+    }
+
+    private void stopGame() {
+        soundPlayer.stopBackgroundMusic();
+        mapLoader.getGameMap().stop();
+    }
 
     @Override
     protected void closeFrame() {
+        stopGame();
         super.closeFrame();
-        soundPlayer.stopBackgroundMusic();
-        map.stop();
+    }
+
+    @Override
+    protected void showFrame(JFrame parent) {
+        initMap();
+        super.showFrame(parent);
     }
 
     @Override
     public void notifyActionResult(ActionResult actionResult, AbstractMovingObject movingObject) {
         if (movingObject.getType().equals(GameObjectType.GOLDMAN)) {
-            Goldman goldMan = (Goldman) movingObject;
-            checkGoldmanActions(actionResult, goldMan);
+            checkGoldmanActions(actionResult);
         }
 
         checkCommonActions(actionResult);
 
-        map.drawMap();
+        gameMap.drawMap();
     }
 
-    private void checkGoldmanActions(ActionResult actionResult, Goldman goldman) {
+    private void checkGoldmanActions(ActionResult actionResult) {
         switch (actionResult) {
             case MOVE -> {
-                jlabelTurnsLeft.setText(String.valueOf(map.getGameMap().getTimeLimit() - goldman.getTurnsNumber()));
+                jlabelTurnsLeft.setText(String.valueOf(getTurnsLeftCount()));
 
-                if (goldman.getTurnsNumber() >= map.getGameMap().getTimeLimit()) {
-                    soundPlayer.stopBackgroundMusic();
+                if (getTurnsLeftCount() == 0) {
                     //map.getGameMap().getGameCollection().notifyMoveListeners(ActionResult.DIE, goldman);
-                    gameFinished(DIE_MESSAGE);
+                    gameFinished(MESSAGE_DIE);
                 }
             }
-            case COLLECT_TREASURE -> jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
+            case COLLECT_TREASURE -> {
+                jlabelScore.setText(String.valueOf(getGoldMan().getTotalScore()));
+                jlabelTurnsLeft.setText(String.valueOf(getTurnsLeftCount()));
+            }
             case WIN -> {
-                jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
-                soundPlayer.stopBackgroundMusic();
-                gameFinished(WIN_MESSAGE + goldman.getTotalScore());
+                //jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
+                gameFinished(MESSAGE_WIN + getGoldMan().getTotalScore());
+                saveScore();
             }
         }
     }
@@ -97,8 +137,7 @@ public class FrameGame extends BaseChildFrame implements MoveResultListener {
     private void checkCommonActions(ActionResult actionResult) {
         switch (actionResult) {
             case DIE -> {
-                soundPlayer.stopBackgroundMusic();
-                gameFinished(DIE_MESSAGE);
+                gameFinished(MESSAGE_DIE);
             }
         }
     }
@@ -386,11 +425,12 @@ public class FrameGame extends BaseChildFrame implements MoveResultListener {
     }//GEN-LAST:event_formKeyPressed
 
     private void jbtnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnExitActionPerformed
-        // TODO add your handling code here:
+        closeFrame();
     }//GEN-LAST:event_jbtnExitActionPerformed
 
     private void jbtnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnSaveActionPerformed
-        // TODO add your handling code here:
+        closeFrame();
+        saveMap();
     }//GEN-LAST:event_jbtnSaveActionPerformed
 
     private void jbtnLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnLeftActionPerformed
@@ -435,4 +475,50 @@ public class FrameGame extends BaseChildFrame implements MoveResultListener {
     private javax.swing.JMenu jmenuService;
     // End of variables declaration//GEN-END:variables
 
+    @Override
+    protected boolean acceptCloseAction() {
+        // останавливаем саму игру, чтобы во время диалогового окна нас не съели
+        mapLoader.getGameMap().stop();
+
+        int result = MessageManager.showYesNoCancelMessage(this, SAVE_GAME_BEFORE_EXIT);
+        switch (result) {
+            case JOptionPane.YES_OPTION -> saveMap();
+            case JOptionPane.NO_OPTION -> closeFrame();
+            case JOptionPane.CANCEL_OPTION -> {
+                mapLoader.getGameMap().start();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void saveScore() {
+        UserScore userScore = new UserScore();
+        userScore.setUser(mapInfo.getUser());
+        userScore.setScore(getGoldMan().getTotalScore());
+        scoreSaver.saveScore(userScore);
+    }
+
+    private void saveMap() {
+        SavedMapInfo savedMapInfo = new SavedMapInfo();
+        savedMapInfo.setId(mapInfo.getId());
+        savedMapInfo.setUser(mapInfo.getUser());
+        savedMapInfo.setTotalScore(getGoldMan().getTotalScore());
+        savedMapInfo.setTurnsCount(getGoldMan().getTurnsNumber());
+        mapLoader.saveMap(savedMapInfo);
+        MessageManager.showInformMessage(this, MESSAGE_SAVED_SUCCESS);
+    }
+
+    private int getTurnsLeftCount() {
+        return mapInfo.getTurnsLimit() - getGoldMan().getTurnsNumber();
+    }
+
+    private int getTotalScore() {
+        return getGoldMan().getTotalScore();
+    }
+
+    private Goldman getGoldMan() {
+        return (Goldman) mapLoader.getGameMap().getGameCollection().getListOfDefinitObjects(GameObjectType.GOLDMAN).get(0);
+    }
 }

@@ -5,12 +5,13 @@ import enums.GameObjectType;
 import gameobjects.interfaces.StaticObject;
 
 import javax.swing.*;
+import java.io.Serializable;
 
 /**
  * класс, который отвечает за любой объект, созданный в игре. задает все общие
  * характеристики объектов в игре
  */
-public abstract class AbstractGameObject implements StaticObject {
+public abstract class AbstractGameObject implements StaticObject, Serializable {
 
     private GameObjectType type; // все объекты будут иметь тип
     private Coordinate coordinate; // все объекты будут иметь координаты их положения

@@ -1,22 +1,24 @@
 package gameobjects.impls;
 
-import gameobjects.abstracts.AbstractGameObject;
-import gameobjects.abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
+import gameobjects.abstracts.AbstractGameObject;
+import gameobjects.abstracts.AbstractSoundObject;
 import sound.interfaces.SoundObject;
 import sound.interfaces.SoundPlayer;
+
+import javax.sound.sampled.Clip;
 
 /**
  * отвечает за работу объекта MONSTER
  */
-public class Monster extends AbstractMovingObject implements SoundObject {
+public class Monster extends AbstractSoundObject implements SoundObject {
 
     public Monster(Coordinate coordinate) {
         super.setCoordinate(coordinate);
         super.setType(GameObjectType.MONSTER);
-        super.setIcon(getImageIcon("/images/monster_left.jpg")); // по умолчанию будет использоваться эта кнопка
+        super.setIcon(getImageIcon("/images/monster_up.jpg")); // по умолчанию будет использоваться эта иконка
     }
 
     @Override
@@ -48,10 +50,10 @@ public class Monster extends AbstractMovingObject implements SoundObject {
     }
 
     @Override
-    public String getSoundName(ActionResult actionResult) {
+    public Clip getSoundClip(ActionResult actionResult) {
         switch (actionResult) {
             case DIE -> {
-                return SoundPlayer.WAV_DIE;
+                return super.getDieClip();
             }
         }
 
