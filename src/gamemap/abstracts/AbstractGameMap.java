@@ -1,5 +1,6 @@
 package gamemap.abstracts;
 
+import collections.impls.MapCollection;
 import gamemap.interfaces.TimeMap;
 import gameobjects.abstracts.AbstractGameObject;
 import gamemap.interfaces.MainMap;
@@ -18,6 +19,7 @@ public abstract class AbstractGameMap implements TimeMap, Serializable {
     protected MapInfo mapInfo = new MapInfo();
 
     public AbstractGameMap() {
+        //gameCollection = new MapCollection();
     }
 
     public AbstractGameMap(GameCollection gameCollection) {

@@ -13,11 +13,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class AbstractMapLoader implements MapLoader {
-
     protected AbstractGameMap gameMap;
 
-    protected AbstractMapLoader(AbstractGameMap abstractGameMap) {
-        this.gameMap = abstractGameMap;
+    protected AbstractMapLoader(AbstractGameMap gameMap) {
+        this.gameMap = gameMap;
     }
 
     protected void createGameObject(String str, Coordinate coordinate) {
@@ -32,6 +31,7 @@ public abstract class AbstractMapLoader implements MapLoader {
         } else if (newObj.getType() == GameObjectType.GOLDMAN) {
             gameMap.getMapInfo().setGoldManExists(true);
         }
+
     }
 
     public AbstractGameMap getGameMap() {
@@ -41,17 +41,17 @@ public abstract class AbstractMapLoader implements MapLoader {
     public int getPlayerId(String username) {
         PreparedStatement selectStmt = null;
         PreparedStatement insertStmt = null;
-        ResultSet res = null;
+        ResultSet rs = null;
 
         try {
             // если есть уже такой пользователь - получить его id
             selectStmt = SQLiteConnection.getInstance().getConnection().prepareStatement("select id from player where username = ?");
             selectStmt.setString(1, username);
 
-            res = selectStmt.executeQuery();
+            rs = selectStmt.executeQuery();
 
-            if (res.next()) {
-                return res.getInt(1);
+            if (rs.next()) {
+                return rs.getInt(1);
             }
 
             selectStmt.close();
@@ -64,23 +64,25 @@ public abstract class AbstractMapLoader implements MapLoader {
             // получить id созданного пользователя
             selectStmt = SQLiteConnection.getInstance().getConnection().prepareStatement("select last_insert_rowid()");
             return selectStmt.executeQuery().getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         } finally {
             try {
+
                 if (selectStmt != null) {
                     selectStmt.close();
                 }
                 if (insertStmt != null) {
                     insertStmt.close();
                 }
-                if (res != null) {
-                    res.close();
+                if (rs != null) {
+                    rs.close();
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException ex) {
+               ex.printStackTrace();
             }
         }
+
         return 0;
     }
 }

@@ -6,9 +6,8 @@ import java.sql.SQLException;
 
 public class SQLiteConnection {
 
-    private SQLiteConnection(){
+    private SQLiteConnection() {
     }
-
     private static final SQLiteConnection instance = new SQLiteConnection();
 
     public static SQLiteConnection getInstance() {
@@ -16,25 +15,23 @@ public class SQLiteConnection {
     }
 
     private Connection con;
-    private String path = "db/goldman..db3";
+    private String path = "db/mygoldman.db3";
 
     public Connection getConnection() {
         try {
             if (con == null) {
 //                // динамическая регистрация драйвера SQLite
-//                Class.forName("org.sqlite.JDBC").newInstance(); // необязательно для последних версий драйверов
+//                Class.forName("org.sqlite.JDBC").newInstance(); // необязательно для последних версий драйверов// необязательно для последних версий драйверов
 
-                // создание подключения к базе данных по пути, указанному в урле
+                // создание подключение к базе данных по пути, указанному в урле
                 String url = "jdbc:sqlite:" + path;
 
                 con = DriverManager.getConnection(url);
-
-                return con;
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return con;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-
         return null;
     }
 
@@ -42,7 +39,7 @@ public class SQLiteConnection {
         try {
             con.close();
             con = null;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

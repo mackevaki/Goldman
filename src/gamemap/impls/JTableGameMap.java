@@ -22,12 +22,12 @@ import java.awt.event.ActionListener;
 public class JTableGameMap extends AbstractGameMap implements TimeMap {
 
     private transient JTable jTableMap = new JTable();
-    private transient TimeMover timeMover = new TimeMover();
     private transient String[] columnNames;
     // объекты для отображения на карте будут храниться в двумерном массиве типа AbstractGameObject
     // каждый элемент массива будет обозначаться согласно текстовому представлению объекта как описано в GameObjectType
     private transient AbstractGameObject[][] mapObjects;
-
+    private transient TimeMover timeMover = new TimeMover();
+    
     public JTableGameMap() {
         try {
             jTableMap.setEnabled(false); // отображение карты в таблице не кликабельно
@@ -119,7 +119,7 @@ public class JTableGameMap extends AbstractGameMap implements TimeMap {
         timeMover.stop();
     }
 
-    private class TimeMover implements ActionListener, MoveResultListener {
+    private class TimeMover implements ActionListener {
 
         private Timer timer;
         private final static int MOVING_PAUSE = 500;
@@ -128,8 +128,6 @@ public class JTableGameMap extends AbstractGameMap implements TimeMap {
         private TimeMover() {
             timer = new Timer(MOVING_PAUSE, this);
             timer.setInitialDelay(INIT_PAUSE);
-            timer.start();
-            getGameCollection().addMoveListener(this);
         }
 
         public void start() {
@@ -148,13 +146,6 @@ public class JTableGameMap extends AbstractGameMap implements TimeMap {
         @Override
         public void actionPerformed(ActionEvent e) {
             getGameCollection().moveObject(new AggressiveMoving(), GameObjectType.MONSTER);
-        }
-
-        @Override
-        public void notifyActionResult(ActionResult actionResult, AbstractMovingObject movingObject) {
-            switch (actionResult) {
-                case WIN, DIE -> timer.stop();
-            }
         }
     }
 
