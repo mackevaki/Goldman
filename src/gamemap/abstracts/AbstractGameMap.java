@@ -1,10 +1,8 @@
 package gamemap.abstracts;
 
-import collections.impls.MapCollection;
+import collections.interfaces.GameCollection;
 import gamemap.interfaces.TimeMap;
 import gameobjects.abstracts.AbstractGameObject;
-import gamemap.interfaces.MainMap;
-import collections.interfaces.GameCollection;
 import objects.MapInfo;
 
 import java.io.Serializable;

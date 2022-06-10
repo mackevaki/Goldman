@@ -18,11 +18,12 @@ public class FSMapLoader extends AbstractMapLoader {
         super(gameMap);
     }
 
+
     @Override
     public boolean loadMap(MapInfo mapInfo) {
         File file = new File("game.map");
         if (!file.exists()) {
-            throw new IllegalArgumentException("filename mist not be empty");
+            throw new IllegalArgumentException("filename must not be empty!");
         }
 
         try {
@@ -35,13 +36,14 @@ public class FSMapLoader extends AbstractMapLoader {
 
             BufferedReader br = new BufferedReader(new FileReader(file));
 
-            String strLine = br.readLine().trim(); // Считываем первую строку для определения имени, длины, ширины карты. Убираем пробелы по краям
+            String strLine = br.readLine().trim(); // считываем первую строку для определения имени, длины, ширины карты. убираем пробела по краям
 
             // разбиваем первую строку на токены, разделенные запятой.
             gameMap.getMapInfo().setMapName(strLine.split(",")[0]);
+            gameMap.getMapInfo().setId(1);
 
-            gameMap.getMapInfo().setTurnsLimit(Integer.parseInt(strLine.split(",")[1]));
-            gameMap.getMapInfo().setWidth(Integer.parseInt(strLine.split(",")[2]));
+            gameMap.getMapInfo().setTurnsLimit(Integer.valueOf(strLine.split(",")[1]).intValue());
+            gameMap.getMapInfo().setWidth(Integer.valueOf(strLine.split(",")[2]).intValue());
 
             int y = 0; // номер строки в массиве
             int x = 0; // номер столбца в массиве
@@ -62,12 +64,11 @@ public class FSMapLoader extends AbstractMapLoader {
                 throw new Exception("The map is not valid!");
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
         }
-        return false;
+        return true;
     }
 
     // количество строк в файле == высота карты

@@ -64,7 +64,7 @@ public class ScoreTableModel extends AbstractTableModel {
                 value = dateFormat.format(date);
             }
             case 3 -> value = list.get(rowIndex).getScore();
-            case 4 -> list.get(rowIndex).getPlayCount();
+            case 4 -> value = list.get(rowIndex).getPlayCount();
             default -> throw new IndexOutOfBoundsException("Column index out of bounds: " + columnIndex);
         }
 

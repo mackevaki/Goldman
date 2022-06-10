@@ -1,16 +1,16 @@
 package collections.impls;
 
-import gameobjects.abstracts.AbstractGameObject;
-import gameobjects.abstracts.AbstractMovingObject;
+import collections.abstracts.MapMoveListenerRegistrator;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
-import movestrategies.interfaces.MoveStrategy;
+import gameobjects.abstracts.AbstractGameObject;
+import gameobjects.abstracts.AbstractMovingObject;
 import gameobjects.impls.Coordinate;
 import gameobjects.impls.Goldman;
 import gameobjects.impls.Nothing;
-import collections.abstracts.MapMoveListenerRegistrator;
 import listeners.interfaces.MoveResultListener;
+import movestrategies.interfaces.MoveStrategy;
 import sound.impls.WavPlayer;
 
 import java.io.Serializable;

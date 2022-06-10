@@ -35,7 +35,7 @@ public class DBScoreSaver implements ScoreSaver {
     }
 
     @Override
-    public ArrayList<UserScore> getScoreList() {
+    public ArrayList<UserScore>     getScoreList() {
         PreparedStatement selectStmt = null;
         ArrayList<UserScore> list = new ArrayList<>();
         ResultSet rs = null;
@@ -48,7 +48,7 @@ public class DBScoreSaver implements ScoreSaver {
                     + "s.play_date, "
                     + "p.username "
                     + "from score s inner join player p on p.id = s.player_id where s.score>0 "
-                    + "group by p.username order by s.score desc, play_count asc limit 10");
+                    + "group by p.username having s.score = max(s.score) order by s.score desc, play_count asc limit 10");
 
             rs = selectStmt.executeQuery();
 
@@ -62,7 +62,6 @@ public class DBScoreSaver implements ScoreSaver {
 
                 list.add(userScore);
             }
-
 
         } catch (SQLException e) {
             e.printStackTrace();

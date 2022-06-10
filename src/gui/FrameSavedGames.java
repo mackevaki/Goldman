@@ -4,7 +4,8 @@
  */
 package gui;
 
-import gamemap.loader.abstracts.AbstractMapLoader;
+import enums.LocationType;
+import gamemap.adapters.HybridMapLoader;
 import models.SavedGamesTableModel;
 import objects.MapInfo;
 import objects.SavedMapInfo;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
  * @author vojtech
  */
 public class FrameSavedGames extends BaseChildFrame {
-    private AbstractMapLoader mapLoader;
+    private HybridMapLoader mapLoader;
     private SavedGamesTableModel model;
     private FrameGame frameGame;
     private ArrayList<SavedMapInfo> list;
@@ -26,7 +27,7 @@ public class FrameSavedGames extends BaseChildFrame {
     /**
      * Creates new form FrameSavedGames
      */
-    public FrameSavedGames(AbstractMapLoader mapLoader, FrameGame frameGame) {
+    public FrameSavedGames(HybridMapLoader mapLoader, FrameGame frameGame) {
         initComponents();
         this.mapLoader = mapLoader;
         this.frameGame = frameGame;
@@ -142,7 +143,7 @@ public class FrameSavedGames extends BaseChildFrame {
         
         MapInfo mapInfo = model.getMapInfo(index);
         
-        mapLoader.loadMap(mapInfo);
+        mapLoader.loadMap(mapInfo, LocationType.DB);
         
         closeFrame();
         
@@ -162,7 +163,7 @@ public class FrameSavedGames extends BaseChildFrame {
 
                 MapInfo mapInfo = model.getMapInfo(index);
 
-                mapLoader.deleteSavedMap(mapInfo);
+                mapLoader.deleteMap(mapInfo,LocationType.DB);
 
                 model.deleteMapInfo(index);
                 model.refresh();
@@ -185,7 +186,7 @@ public class FrameSavedGames extends BaseChildFrame {
 
     @Override
     protected void showFrame(JFrame parent) {
-        list = mapLoader.getSavedMapList(mapLoader.getGameMap().getMapInfo().getUser());
+        list = mapLoader.getSavedMapList(mapLoader.getGameMap().getMapInfo().getUser(), LocationType.DB);
 
         model = new SavedGamesTableModel(list);
 

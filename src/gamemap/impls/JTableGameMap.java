@@ -1,15 +1,13 @@
 package gamemap.impls;
 
-import enums.ActionResult;
+import collections.interfaces.GameCollection;
 import enums.GameObjectType;
 import gamemap.abstracts.AbstractGameMap;
 import gamemap.interfaces.TimeMap;
 import gameobjects.abstracts.AbstractGameObject;
-import gameobjects.abstracts.AbstractMovingObject;
 import gameobjects.impls.Coordinate;
 import gameobjects.impls.Nothing;
 import gameobjects.impls.Wall;
-import listeners.interfaces.MoveResultListener;
 import movestrategies.impls.AggressiveMoving;
 
 import javax.swing.*;
@@ -28,7 +26,9 @@ public class JTableGameMap extends AbstractGameMap implements TimeMap {
     private transient AbstractGameObject[][] mapObjects;
     private transient TimeMover timeMover = new TimeMover();
     
-    public JTableGameMap() {
+    public JTableGameMap(GameCollection gameCollection) {
+        super(gameCollection);
+
         try {
             jTableMap.setEnabled(false); // отображение карты в таблице не кликабельно
             jTableMap.setSize(new Dimension(300, 300));

@@ -4,9 +4,11 @@
  */
 package gui;
 
+import collections.impls.MapCollection;
+import enums.LocationType;
+import gamemap.adapters.HybridMapLoader;
+import gamemap.facades.GameFacade;
 import gamemap.impls.JTableGameMap;
-import gamemap.loader.abstracts.AbstractMapLoader;
-import gamemap.loader.impls.DBMapLoader;
 import objects.MapInfo;
 import objects.User;
 import score.impls.DBScoreSaver;
@@ -23,18 +25,17 @@ import javax.swing.*;
 public class FrameMainMenu extends JFrame {
 
     private FrameGame frameGame;
-    private FrameStat frameStat; // = new FrameStat();
-    private FrameSavedGames frameSavedGames; // = new FrameSavedGames();
+    private FrameStat frameStat;
+    private FrameSavedGames frameSavedGames;
 
-    //private AbstractUserManager userManager = new DBUserManager();
     private ScoreSaver scoreSaver = new DBScoreSaver();
     private CustomDialog usernameDialog = new CustomDialog(this, "Имя пользователя", "Введите имя:", true);;
-    private JTableGameMap gameMap = new JTableGameMap();
-    private AbstractMapLoader mapLoader = new DBMapLoader(gameMap);
+    private JTableGameMap gameMap = new JTableGameMap(new MapCollection());
+    private HybridMapLoader mapLoader = new HybridMapLoader(gameMap);
     private SoundPlayer soundPlayer = new WavPlayer();
     private static final int MAP_LEVEL_ONE = 1;
     private User user;
-
+    private GameFacade gameFacade = new GameFacade(mapLoader, scoreSaver, soundPlayer);
 
     /**
      * Creates new form FrameMainMenu
@@ -170,9 +171,11 @@ public class FrameMainMenu extends JFrame {
         MapInfo mapInfo = new MapInfo();
         mapInfo.setLevelId(MAP_LEVEL_ONE);
 
-        if (!mapLoader.loadMap(mapInfo)) {
+        if (!mapLoader.loadMap(mapInfo, LocationType.FS)) {
             return;
         }
+
+        gameFacade.setMapLoader(mapLoader);
 
         createFrameGame();
 
@@ -181,7 +184,7 @@ public class FrameMainMenu extends JFrame {
 
     private void createFrameGame() {
         if (frameGame == null) {
-            frameGame = new FrameGame(scoreSaver, mapLoader, soundPlayer);
+            frameGame = new FrameGame(gameFacade);
         }
     }
 

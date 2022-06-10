@@ -4,21 +4,12 @@
  */
 package gui;
 
-import gamemap.abstracts.AbstractGameMap;
-import gamemap.loader.abstracts.AbstractMapLoader;
-import gameobjects.abstracts.AbstractMovingObject;
 import enums.ActionResult;
 import enums.GameObjectType;
 import enums.MovingDirection;
-import gamemap.interfaces.TimeMap;
-import gameobjects.impls.Goldman;
+import gamemap.facades.GameFacade;
+import gameobjects.abstracts.AbstractMovingObject;
 import listeners.interfaces.MoveResultListener;
-import objects.MapInfo;
-import objects.SavedMapInfo;
-import score.interfaces.ScoreSaver;
-import score.objects.UserScore;
-import sound.impls.WavPlayer;
-import sound.interfaces.SoundPlayer;
 import utils.MessageManager;
 
 import javax.swing.*;
@@ -28,118 +19,15 @@ public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
     private static final String MESSAGE_SAVED_SUCCESS = "Игра сохранена!";
     private static final String MESSAGE_DIE = "Вы проиграли!";
     private static final String MESSAGE_WIN = "Вы выиграли! Количество очков: ";
-    // был тайммеп, перенесли функционала из гейммепа в меплоадер - по загрузке мапы из файла или бд
-    private AbstractGameMap gameMap; // передаем объект карты, которая умеет себя рисовать
-    private SoundPlayer soundPlayer;
-    private ScoreSaver scoreSaver;
-    private MapInfo mapInfo;
-    private AbstractMapLoader mapLoader;
+
+    private GameFacade gameFacade;
 
     /**
      * Creates new form FrameGame
      */
-    public FrameGame(ScoreSaver scoreSaver, AbstractMapLoader mapLoader, SoundPlayer soundPlayer) {
-        this.mapLoader = mapLoader;
-        this.scoreSaver = scoreSaver;
-        this.soundPlayer = soundPlayer;
+    public FrameGame(GameFacade gameFacade) {
+        this.gameFacade = gameFacade;
         initComponents();
-    }
-
-    public void initMap() {
-        this.gameMap = mapLoader.getGameMap();
-        gameMap.drawMap();
-
-        // слушатели для звуков должны идти в первую очередь, т.к. они запускаются в отдельном потоке и не мешают выполняться следующим слушателям
-        if (soundPlayer instanceof MoveResultListener) {
-            mapLoader.getGameMap().getGameCollection().addMoveListener((MoveResultListener) soundPlayer);
-        }
-
-        gameMap.getGameCollection().addMoveListener(this);
-
-        jPanelMap.removeAll();
-        jPanelMap.add(mapLoader.getGameMap().getMapComponent());
-
-        mapInfo = gameMap.getMapInfo();
-
-        jlabelTurnsLeft.setText(String.valueOf(getTurnsLeftCount()));
-        jlabelScore.setText(String.valueOf(getTotalScore()));
-
-        startGame();
-
-    }
-
-
-    private void moveGameObject(MovingDirection direction, GameObjectType gameObjectType) {
-        gameMap.getGameCollection().moveObject(direction, gameObjectType);
-    }
-
-    private void gameFinished(String message) {
-        stopGame();
-        MessageManager.showInformMessage(null, message);
-        closeFrame();
-    }
-
-    private void startGame() {
-        soundPlayer.startBackgroundMusic(WavPlayer.WAV_BACKGROUND);
-        mapLoader.getGameMap().start();
-    }
-
-    private void stopGame() {
-        soundPlayer.stopBackgroundMusic();
-        mapLoader.getGameMap().stop();
-    }
-
-    @Override
-    protected void closeFrame() {
-        stopGame();
-        super.closeFrame();
-    }
-
-    @Override
-    protected void showFrame(JFrame parent) {
-        initMap();
-        super.showFrame(parent);
-    }
-
-    @Override
-    public void notifyActionResult(ActionResult actionResult, AbstractMovingObject movingObject) {
-        if (movingObject.getType().equals(GameObjectType.GOLDMAN)) {
-            checkGoldmanActions(actionResult);
-        }
-
-        checkCommonActions(actionResult);
-
-        gameMap.drawMap();
-    }
-
-    private void checkGoldmanActions(ActionResult actionResult) {
-        switch (actionResult) {
-            case MOVE -> {
-                jlabelTurnsLeft.setText(String.valueOf(getTurnsLeftCount()));
-
-                if (getTurnsLeftCount() == 0) {
-                    //map.getGameMap().getGameCollection().notifyMoveListeners(ActionResult.DIE, goldman);
-                    gameFinished(MESSAGE_DIE);
-                }
-            }
-            case COLLECT_TREASURE -> {
-                jlabelScore.setText(String.valueOf(getGoldMan().getTotalScore()));
-                jlabelTurnsLeft.setText(String.valueOf(getTurnsLeftCount()));
-            }
-            case WIN -> {
-                //jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
-                gameFinished(MESSAGE_WIN + getGoldMan().getTotalScore());
-                saveScore();
-            }
-        }
-    }
-
-    private void checkCommonActions(ActionResult actionResult) {
-        switch (actionResult) {
-            case DIE -> {
-                gameFinished(MESSAGE_DIE);
-            }
-        }
     }
 
     /**
@@ -429,27 +317,27 @@ public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
     }//GEN-LAST:event_jbtnExitActionPerformed
 
     private void jbtnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnSaveActionPerformed
-        closeFrame();
-        saveMap();
+        gameFacade.saveMap();
+        closeFrame(MESSAGE_SAVED_SUCCESS);
     }//GEN-LAST:event_jbtnSaveActionPerformed
 
     private void jbtnLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnLeftActionPerformed
-        moveGameObject(MovingDirection.LEFT, GameObjectType.GOLDMAN);
+        gameFacade.moveGameObject(MovingDirection.LEFT, GameObjectType.GOLDMAN);
 
     }//GEN-LAST:event_jbtnLeftActionPerformed
 
     private void jbtnRightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnRightActionPerformed
-        moveGameObject(MovingDirection.RIGHT, GameObjectType.GOLDMAN);
+        gameFacade.moveGameObject(MovingDirection.RIGHT, GameObjectType.GOLDMAN);
 
     }//GEN-LAST:event_jbtnRightActionPerformed
 
     private void jbtnDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnDownActionPerformed
-        moveGameObject(MovingDirection.DOWN, GameObjectType.GOLDMAN);
+        gameFacade.moveGameObject(MovingDirection.DOWN, GameObjectType.GOLDMAN);
 
     }//GEN-LAST:event_jbtnDownActionPerformed
 
     private void jbtnUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnUpActionPerformed
-        moveGameObject(MovingDirection.UP, GameObjectType.GOLDMAN);
+        gameFacade.moveGameObject(MovingDirection.UP, GameObjectType.GOLDMAN);
     }//GEN-LAST:event_jbtnUpActionPerformed
 
 
@@ -475,50 +363,101 @@ public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
     private javax.swing.JMenu jmenuService;
     // End of variables declaration//GEN-END:variables
 
+    public void initMap() {
+
+        gameFacade.addMoveListener(this);
+
+        jPanelMap.removeAll();
+        jPanelMap.add(gameFacade.getMap());
+
+        jlabelTurnsLeft.setText(String.valueOf(gameFacade.getTurnsLeftCount()));
+        jlabelScore.setText(String.valueOf(gameFacade.getTotalScore()));
+
+        gameFacade.startGame();
+    }
+
+    private void closeFrame(final String message) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                MessageManager.showInformMessage(null, message);
+            }
+        });
+
+        closeFrame();
+    }
+
+    @Override
+    protected void closeFrame() {
+        gameFacade.stopGame();
+        super.closeFrame();
+    }
+
+    @Override
+    protected void showFrame(JFrame parent) {
+        initMap();
+        super.showFrame(parent);
+    }
+
+    @Override
+    public void notifyActionResult(ActionResult actionResult, AbstractMovingObject movingObject) {
+        if (movingObject.getType().equals(GameObjectType.GOLDMAN)) {
+            checkGoldmanActions(actionResult);
+        }
+
+        checkCommonActions(actionResult);
+
+        gameFacade.updateMap();
+    }
+
+    private void checkGoldmanActions(ActionResult actionResult) {
+        switch (actionResult) {
+            case MOVE -> {
+                jlabelTurnsLeft.setText(String.valueOf(gameFacade.getTurnsLeftCount()));
+
+                if (gameFacade.getTurnsLeftCount() == 0) {
+                    //map.getGameMap().getGameCollection().notifyMoveListeners(ActionResult.DIE, goldman);
+                    closeFrame(MESSAGE_DIE);
+                }
+            }
+            case COLLECT_TREASURE -> {
+                jlabelScore.setText(String.valueOf(gameFacade.getTotalScore()));
+                jlabelTurnsLeft.setText(String.valueOf(gameFacade.getTurnsLeftCount()));
+            }
+            case WIN -> {
+                //jlabelScore.setText(String.valueOf(goldman.getTotalScore()));
+                closeFrame(MESSAGE_WIN + gameFacade.getTotalScore());
+                gameFacade.saveScore();
+            }
+        }
+    }
+
+    private void checkCommonActions(ActionResult actionResult) {
+        switch (actionResult) {
+            case DIE -> {
+                closeFrame(MESSAGE_DIE);
+            }
+        }
+    }
+
     @Override
     protected boolean acceptCloseAction() {
         // останавливаем саму игру, чтобы во время диалогового окна нас не съели
-        mapLoader.getGameMap().stop();
+        gameFacade.stopGame();
 
         int result = MessageManager.showYesNoCancelMessage(this, SAVE_GAME_BEFORE_EXIT);
         switch (result) {
-            case JOptionPane.YES_OPTION -> saveMap();
+            case JOptionPane.YES_OPTION -> {
+                gameFacade.saveMap();
+                MessageManager.showInformMessage(this, MESSAGE_SAVED_SUCCESS);
+            }
             case JOptionPane.NO_OPTION -> closeFrame();
             case JOptionPane.CANCEL_OPTION -> {
-                mapLoader.getGameMap().start();
+                gameFacade.startGame();
                 return false;
             }
         }
 
         return true;
-    }
-
-    private void saveScore() {
-        UserScore userScore = new UserScore();
-        userScore.setUser(mapInfo.getUser());
-        userScore.setScore(getGoldMan().getTotalScore());
-        scoreSaver.saveScore(userScore);
-    }
-
-    private void saveMap() {
-        SavedMapInfo savedMapInfo = new SavedMapInfo();
-        savedMapInfo.setId(mapInfo.getId());
-        savedMapInfo.setUser(mapInfo.getUser());
-        savedMapInfo.setTotalScore(getGoldMan().getTotalScore());
-        savedMapInfo.setTurnsCount(getGoldMan().getTurnsNumber());
-        mapLoader.saveMap(savedMapInfo);
-        MessageManager.showInformMessage(this, MESSAGE_SAVED_SUCCESS);
-    }
-
-    private int getTurnsLeftCount() {
-        return mapInfo.getTurnsLimit() - getGoldMan().getTurnsNumber();
-    }
-
-    private int getTotalScore() {
-        return getGoldMan().getTotalScore();
-    }
-
-    private Goldman getGoldMan() {
-        return (Goldman) mapLoader.getGameMap().getGameCollection().getListOfDefinitObjects(GameObjectType.GOLDMAN).get(0);
     }
 }

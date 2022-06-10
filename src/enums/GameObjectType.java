@@ -6,6 +6,7 @@ import java.io.Serializable;
 * типы объектов, которые участвуют в игре (которые будут рисоваться на карте)
 */
 public enum GameObjectType implements Serializable {
+    TREE(6),
     MONSTER(5),
     TREASURE(4),
     EXIT(3),
