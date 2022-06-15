@@ -139,7 +139,6 @@ public class MapCollection extends MapMoveListenerRegistrator implements Seriali
                 }
 
                 notifyMoveListeners(actionResult, goldman);
-
             }
         }
 

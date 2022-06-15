@@ -14,19 +14,25 @@ import javax.sound.sampled.Clip;
  * класс отвечает за работу объекта GOLDMAN - главный персонаж игры
  */
 public class Goldman extends AbstractSoundObject implements SoundObject {
-    
+
     private int totalScore = 0; // количество собранных игроком очков
     private int turnsNumber = 0; // количество сделанных ходов
 
     private transient Clip moveClip;
     private transient Clip treasureClip;
     private transient Clip winClip;
+    private transient Clip treeClip;
 
 
     public Goldman(Coordinate coordinate) {
         super.setCoordinate(coordinate);
         super.setType(GameObjectType.GOLDMAN);
         super.setIcon(getImageIcon("/images/goldman_up.png"));
+
+        movingImages.put(MovingDirection.LEFT, getImageIcon("/images/goldman_left.png"));
+        movingImages.put(MovingDirection.RIGHT, getImageIcon("/images/goldman_right.png"));
+        movingImages.put(MovingDirection.DOWN, getImageIcon("/images/goldman_down.png"));
+        movingImages.put(MovingDirection.UP, getImageIcon("/images/goldman_up.png"));
     }
 
     public int getTotalScore() {
@@ -45,15 +51,6 @@ public class Goldman extends AbstractSoundObject implements SoundObject {
         this.turnsNumber = turnsNumber;
     }
 
-    @Override
-    public void changeIcon(MovingDirection direction) {
-        switch (direction) {
-            case LEFT -> super.setIcon(getImageIcon("/images/goldman_left.png"));
-            case RIGHT -> super.setIcon(getImageIcon("/images/goldman_right.png"));
-            case DOWN -> super.setIcon(getImageIcon("/images/goldman_down.png"));
-            case UP -> super.setIcon(getImageIcon("/images/goldman_up.png"));
-        }
-    }
 
     /**
      * @param gameObject - объект, с которым будем взаимодействовать
@@ -97,19 +94,26 @@ public class Goldman extends AbstractSoundObject implements SoundObject {
             treasureClip = openClip(WavPlayer.WAV_TREASURE);
         }
 
-        if (winClip ==null) {
+        if (winClip == null) {
             winClip = openClip(WavPlayer.WAV_WIN);
+        }
+
+        if (treeClip == null) {
+            treeClip = openClip(WavPlayer.WAV_TREE);
         }
 
         switch (actionResult) {
             case DIE -> {
                 return super.getDieClip();
             }
-            case WIN ->{
+            case WIN -> {
                 return winClip;
             }
             case COLLECT_TREASURE -> {
                 return treasureClip;
+            }
+            case HIDE_IN_TREE -> {
+                return treeClip;
             }
         }
 

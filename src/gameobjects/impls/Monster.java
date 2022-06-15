@@ -6,7 +6,6 @@ import enums.MovingDirection;
 import gameobjects.abstracts.AbstractGameObject;
 import gameobjects.abstracts.AbstractSoundObject;
 import sound.interfaces.SoundObject;
-import sound.interfaces.SoundPlayer;
 
 import javax.sound.sampled.Clip;
 
@@ -19,16 +18,10 @@ public class Monster extends AbstractSoundObject implements SoundObject {
         super.setCoordinate(coordinate);
         super.setType(GameObjectType.MONSTER);
         super.setIcon(getImageIcon("/images/monster_up.jpg")); // по умолчанию будет использоваться эта иконка
-    }
-
-    @Override
-    public void changeIcon(MovingDirection direction) {
-        switch (direction) {
-            case LEFT -> super.setIcon(getImageIcon("/images/monster_left.jpg"));
-            case RIGHT -> super.setIcon(getImageIcon("/images/monster_right.jpg"));
-            case DOWN -> super.setIcon(getImageIcon("/images/monster_down.jpg"));
-            case UP -> super.setIcon(getImageIcon("/images/monster_up.jpg"));
-        }
+        movingImages.put(MovingDirection.LEFT, getImageIcon("/images/monster_left.jpg"));
+        movingImages.put(MovingDirection.RIGHT, getImageIcon("/images/monster_right.jpg"));
+        movingImages.put(MovingDirection.DOWN, getImageIcon("/images/monster_down.jpg"));
+        movingImages.put(MovingDirection.UP, getImageIcon("/images/monster_up.jpg"));
     }
 
     @Override

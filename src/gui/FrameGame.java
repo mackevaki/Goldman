@@ -9,6 +9,7 @@ import enums.GameObjectType;
 import enums.MovingDirection;
 import gamemap.facades.GameFacade;
 import gameobjects.abstracts.AbstractMovingObject;
+import listeners.interfaces.CloseFrameListener;
 import listeners.interfaces.MoveResultListener;
 import utils.MessageManager;
 
@@ -20,6 +21,7 @@ public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
     private static final String MESSAGE_DIE = "Вы проиграли!";
     private static final String MESSAGE_WIN = "Вы выиграли! Количество очков: ";
 
+    private FrameStat frameStat;
     private GameFacade gameFacade;
 
     /**
@@ -54,10 +56,10 @@ public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
         jbtnExit = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jmenuFile = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuSaveI = new javax.swing.JMenuItem();
+        jMenuExit = new javax.swing.JMenuItem();
         jmenuService = new javax.swing.JMenu();
-        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuStat = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Game");
@@ -238,39 +240,39 @@ public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
 
         jmenuFile.setText("Файл");
 
-        jMenuItem1.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
-        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.png"))); // NOI18N
-        jMenuItem1.setText("Сохранить игру");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        jMenuSaveI.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
+        jMenuSaveI.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.png"))); // NOI18N
+        jMenuSaveI.setText("Сохранить игру");
+        jMenuSaveI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                jMenuSaveIActionPerformed(evt);
             }
         });
-        jmenuFile.add(jMenuItem1);
+        jmenuFile.add(jMenuSaveI);
 
-        jMenuItem2.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
-        jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/exit.png"))); // NOI18N
-        jMenuItem2.setText("Выйти из игры");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        jMenuExit.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
+        jMenuExit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/exit.png"))); // NOI18N
+        jMenuExit.setText("Выйти из игры");
+        jMenuExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                jMenuExitActionPerformed(evt);
             }
         });
-        jmenuFile.add(jMenuItem2);
+        jmenuFile.add(jMenuExit);
 
         jMenuBar1.add(jmenuFile);
 
         jmenuService.setText("Сервис");
 
-        jMenuItem3.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
-        jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/stat.png"))); // NOI18N
-        jMenuItem3.setText("Статистика");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+        jMenuStat.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
+        jMenuStat.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/stat.png"))); // NOI18N
+        jMenuStat.setText("Статистика");
+        jMenuStat.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
+                jMenuStatActionPerformed(evt);
             }
         });
-        jmenuService.add(jMenuItem3);
+        jmenuService.add(jMenuStat);
 
         jMenuBar1.add(jmenuService);
 
@@ -296,24 +298,40 @@ public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    private void jMenuSaveIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuSaveIActionPerformed
+        saveMap();
+    }//GEN-LAST:event_jMenuSaveIActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    private void jMenuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuExitActionPerformed
+        if (allowExit()) {
+            closeFrame();
+        }
+    }//GEN-LAST:event_jMenuExitActionPerformed
 
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
+    private void jMenuStatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuStatActionPerformed
+        gameFacade.stopGame();
+        if (frameStat == null) {
+            frameStat = new FrameStat(new CloseFrameListener() {
+                @Override
+                public void onCloseAction() {
+                    gameFacade.startGame();
+                }
+            });
+
+        }
+
+        frameStat.setList(gameFacade.getScoreSaver().getScoreList());
+        frameStat.showFrame(this);
+    }//GEN-LAST:event_jMenuStatActionPerformed
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         System.out.println(evt.getKeyCode());
     }//GEN-LAST:event_formKeyPressed
 
     private void jbtnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnExitActionPerformed
-        closeFrame();
+        if (allowExit()) {
+            closeFrame();
+        }
     }//GEN-LAST:event_jbtnExitActionPerformed
 
     private void jbtnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnSaveActionPerformed
@@ -343,9 +361,9 @@ public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuExit;
+    private javax.swing.JMenuItem jMenuSaveI;
+    private javax.swing.JMenuItem jMenuStat;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanelMap;
@@ -442,6 +460,10 @@ public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
 
     @Override
     protected boolean acceptCloseAction() {
+        return allowExit();
+    }
+
+    private boolean allowExit() {
         // останавливаем саму игру, чтобы во время диалогового окна нас не съели
         gameFacade.stopGame();
 
@@ -459,5 +481,10 @@ public class FrameGame extends ConfirmCLoseFrame implements MoveResultListener {
         }
 
         return true;
+    }
+
+    private void saveMap() {
+        gameFacade.saveMap();
+        closeFrame(MESSAGE_SAVED_SUCCESS);
     }
 }

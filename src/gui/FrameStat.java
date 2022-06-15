@@ -4,6 +4,7 @@
  */
 package gui;
 
+import listeners.interfaces.CloseFrameListener;
 import models.ScoreTableModel;
 import score.objects.UserScore;
 
@@ -17,11 +18,17 @@ import java.util.ArrayList;
 public class FrameStat extends BaseChildFrame {
 
     private ArrayList<UserScore> list;
+    private CloseFrameListener closeFrameListener;
 
     /**
      * Creates new form FrameStat
      */
     public FrameStat() {
+        initComponents();
+    }
+
+    public FrameStat(CloseFrameListener closeFrameListener) {
+        this.closeFrameListener = closeFrameListener;
         initComponents();
     }
 
@@ -112,5 +119,17 @@ public class FrameStat extends BaseChildFrame {
         jTable1.setRowHeight(40);
 
         super.showFrame(parent);
+    }
+
+    @Override
+    protected void closeFrame() {
+        super.closeFrame();
+        if (closeFrameListener != null) {
+            onClose(closeFrameListener);
+        }
+    }
+
+    private void onClose(CloseFrameListener closeFrameListener) {
+        closeFrameListener.onCloseAction();
     }
 }

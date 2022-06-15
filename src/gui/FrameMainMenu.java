@@ -17,13 +17,15 @@ import sound.impls.WavPlayer;
 import sound.interfaces.SoundPlayer;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.List;
 
 /**
  *
  * @author vojtech
  */
 public class FrameMainMenu extends JFrame {
-
+    private JDialog splashDialog;
     private FrameGame frameGame;
     private FrameStat frameStat;
     private FrameSavedGames frameSavedGames;
@@ -168,18 +170,38 @@ public class FrameMainMenu extends JFrame {
             return;
         }
 
-        MapInfo mapInfo = new MapInfo();
-        mapInfo.setLevelId(MAP_LEVEL_ONE);
+        showSplash();
+        SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                MapInfo mapInfo = new MapInfo();
+                mapInfo.setLevelId(MAP_LEVEL_ONE);
 
-        if (!mapLoader.loadMap(mapInfo, LocationType.FS)) {
-            return;
-        }
+                if (!mapLoader.loadMap(mapInfo, LocationType.FS)) {
+                    throw new Exception("Error loading map!");
+                }
 
-        gameFacade.setMapLoader(mapLoader);
+                gameFacade.setMapLoader(mapLoader);
 
-        createFrameGame();
+                createFrameGame();
 
-        frameGame.showFrame(this);
+                Thread.sleep(1000);
+                return null;
+            }
+
+            @Override
+            protected void process(List<Integer> chunks) {
+                super.process(chunks);
+            }
+
+            @Override
+            protected void done() {
+                hideSplash();
+                FrameMainMenu.this.frameGame.showFrame(FrameMainMenu.this);
+            }
+        };
+
+        worker.execute();
     }//GEN-LAST:event_jbtnNewGameActionPerformed
 
     private void createFrameGame() {
@@ -292,4 +314,33 @@ public class FrameMainMenu extends JFrame {
         return usernameDialog.getValidatedText();
     }
 
+    public void showSplash() {
+      if (splashDialog == null) {
+          splashDialog = new JDialog(FrameMainMenu.this);
+
+          splashDialog.setSize(200, 100);
+          splashDialog.setUndecorated(true);
+          splashDialog.setModal(false);
+
+          JPanel jPanel = new JPanel(new GridLayout());
+          jPanel.setBorder(BorderFactory.createLineBorder(Color.RED, 3));
+
+          JLabel text = new JLabel("Загрузка...");
+          text.setFont(new Font("Tahoma", Font.BOLD, 15));
+
+          jPanel.setBackground(Color.LIGHT_GRAY);
+
+          jPanel.add(text);
+          splashDialog.add(jPanel);
+          splashDialog.setLocationRelativeTo(FrameMainMenu.this);
+      }
+
+        splashDialog.getParent().setEnabled(false);
+        splashDialog.setVisible(true);
+    }
+
+    private void hideSplash() {
+        splashDialog.setVisible(false);
+        splashDialog.getParent().setEnabled(true);
+    }
 }

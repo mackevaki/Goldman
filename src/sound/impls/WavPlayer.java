@@ -14,6 +14,7 @@ public class WavPlayer implements MoveResultListener, SoundPlayer {
     public static final String WAV_WIN = "win.wav";
     public static final String WAV_TREASURE = "treasure.wav";
     public static final String WAV_BACKGROUND = "background.wav";
+    public static final String WAV_TREE = "tree.wav";
     public static final String SOUND_PATH = "/sound/sounds/";
 
     private Clip backgroundClip;

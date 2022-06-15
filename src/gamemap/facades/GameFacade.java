@@ -54,6 +54,26 @@ public class GameFacade {
         this.scoreSaver = scoreSaver;
     }
 
+    public HybridMapLoader getMapLoader() {
+        return mapLoader;
+    }
+
+    public ScoreSaver getScoreSaver() {
+        return scoreSaver;
+    }
+
+    public MapInfo getMapInfo() {
+        return mapInfo;
+    }
+
+    public SoundPlayer getSoundPlayer() {
+        return soundPlayer;
+    }
+
+    public AbstractGameMap getGameMap() {
+        return gameMap;
+    }
+
     public void stopGame() {
         soundPlayer.stopBackgroundMusic();
         mapLoader.getGameMap().stop();
