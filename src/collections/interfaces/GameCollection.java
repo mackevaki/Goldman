@@ -15,7 +15,7 @@ public interface GameCollection extends MoveResultNotifier {
 
     Collection<AbstractGameObject> getAllGameObjects();
 
-    List<AbstractGameObject> getListOfDefinitObjects(GameObjectType type);
+    List<AbstractGameObject> getGameObjectsByType(GameObjectType type);
 
     AbstractGameObject getObjectByCoordinate(Coordinate coordinate);
 

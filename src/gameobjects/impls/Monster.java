@@ -38,7 +38,7 @@ public class Monster extends AbstractSoundObject implements SoundObject {
         }
 
         switch (gameObject.getType()) {
-            case TREASURE, MONSTER, WALL -> {
+            case TREASURE, MONSTER, WALL, TREE -> {
                 return ActionResult.NO_ACTION; //монстр не может наступать на сокровище или других монстров
             }
             case GOLDMAN -> {

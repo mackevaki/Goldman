@@ -237,7 +237,7 @@ public class DBMapLoader extends AbstractMapLoader {
                 gameMap.getMapInfo().setTurnsLimit(res.getInt("turns_limit"));
                 //gameMap.getMapInfo().setLevelId(res.getInt("level_id"));
 
-                Goldman goldMan = (Goldman)gameMap.getGameCollection().getListOfDefinitObjects(GameObjectType.GOLDMAN).get(0);
+                Goldman goldMan = (Goldman)gameMap.getGameCollection().getGameObjectsByType(GameObjectType.GOLDMAN).get(0);
                 goldMan.setTurnsNumber(res.getInt("turns_count"));
                 goldMan.addTotalScore(res.getInt("total_score"));
             }

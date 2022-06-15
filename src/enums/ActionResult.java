@@ -8,5 +8,6 @@ public enum ActionResult {
     DIE, // игрок умирает
     WIN, // игрок выиграл
     MOVE, // движение игрока
-    COLLECT_TREASURE // собрал золото
+    COLLECT_TREASURE, // собрал золото
+    HIDE_IN_TREE //спрятаться в дереве
 }

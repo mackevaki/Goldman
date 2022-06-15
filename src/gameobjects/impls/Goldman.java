@@ -79,6 +79,9 @@ public class Goldman extends AbstractSoundObject implements SoundObject {
                 totalScore *= 2;
                 return ActionResult.WIN;
             }
+            case TREE -> {
+                return ActionResult.HIDE_IN_TREE;
+            }
         }
 
         return super.doAction(gameObject);

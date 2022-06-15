@@ -42,8 +42,8 @@ public class FSMapLoader extends AbstractMapLoader {
             gameMap.getMapInfo().setMapName(strLine.split(",")[0]);
             gameMap.getMapInfo().setId(1);
 
-            gameMap.getMapInfo().setTurnsLimit(Integer.valueOf(strLine.split(",")[1]).intValue());
-            gameMap.getMapInfo().setWidth(Integer.valueOf(strLine.split(",")[2]).intValue());
+            gameMap.getMapInfo().setTurnsLimit(Integer.parseInt(strLine.split(",")[1]));
+            gameMap.getMapInfo().setWidth(Integer.parseInt(strLine.split(",")[2]));
 
             int y = 0; // номер строки в массиве
             int x = 0; // номер столбца в массиве

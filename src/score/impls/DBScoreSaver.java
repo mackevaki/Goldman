@@ -1,10 +1,9 @@
 package score.impls;
 
 import database.SQLiteConnection;
-import score.abstracts.AbstractScoreSaver;
+import objects.User;
 import score.interfaces.ScoreSaver;
 import score.objects.UserScore;
-import objects.User;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

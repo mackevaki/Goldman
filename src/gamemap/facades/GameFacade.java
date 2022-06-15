@@ -13,7 +13,6 @@ import score.interfaces.ScoreSaver;
 import score.objects.UserScore;
 import sound.impls.WavPlayer;
 import sound.interfaces.SoundPlayer;
-import utils.MessageManager;
 
 import java.awt.*;
 
@@ -96,7 +95,7 @@ public class GameFacade {
     }
 
     private Goldman getGoldman() {
-        return (Goldman) mapLoader.getGameMap().getGameCollection().getListOfDefinitObjects(GameObjectType.GOLDMAN).get(0);
+        return (Goldman) mapLoader.getGameMap().getGameCollection().getGameObjectsByType(GameObjectType.GOLDMAN).get(0);
     }
 
     public int getTurnsLeftCount() {

@@ -33,6 +33,9 @@ public class GameObjectCreator {
             case TREASURE -> {
                 obj = new Treasure(coordinate);
             }
+            case TREE -> {
+                obj = new Tree(coordinate);
+            }
             default -> throw new IllegalArgumentException("Can't create object type: " + type);
         }
 
