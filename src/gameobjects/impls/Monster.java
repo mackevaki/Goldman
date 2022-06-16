@@ -8,20 +8,26 @@ import gameobjects.abstracts.AbstractSoundObject;
 import sound.interfaces.SoundObject;
 
 import javax.sound.sampled.Clip;
+import javax.swing.*;
+import java.util.EnumMap;
 
 /**
  * отвечает за работу объекта MONSTER
  */
 public class Monster extends AbstractSoundObject implements SoundObject {
+    protected static EnumMap<MovingDirection, ImageIcon> monsterImages = new EnumMap<>(MovingDirection.class); // карта иконок для всех направлений монстра
 
     public Monster(Coordinate coordinate) {
         super.setCoordinate(coordinate);
         super.setType(GameObjectType.MONSTER);
         super.setIcon(getImageIcon("/images/monster_up.jpg")); // по умолчанию будет использоваться эта иконка
-        movingImages.put(MovingDirection.LEFT, getImageIcon("/images/monster_left.jpg"));
-        movingImages.put(MovingDirection.RIGHT, getImageIcon("/images/monster_right.jpg"));
-        movingImages.put(MovingDirection.DOWN, getImageIcon("/images/monster_down.jpg"));
-        movingImages.put(MovingDirection.UP, getImageIcon("/images/monster_up.jpg"));
+
+        if(monsterImages.isEmpty()) {
+            monsterImages.put(MovingDirection.LEFT, getImageIcon("/images/monster_left.jpg"));
+            monsterImages.put(MovingDirection.RIGHT, getImageIcon("/images/monster_right.jpg"));
+            monsterImages.put(MovingDirection.DOWN, getImageIcon("/images/monster_down.jpg"));
+            monsterImages.put(MovingDirection.UP, getImageIcon("/images/monster_up.jpg"));
+        }
     }
 
     @Override
@@ -52,4 +58,10 @@ public class Monster extends AbstractSoundObject implements SoundObject {
 
         return null;
     }
+
+    @Override
+    public void changeIcon(MovingDirection direction) {
+        super.setIcon(monsterImages.get(direction));
+    }
+
 }
